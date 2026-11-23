@@ -4,7 +4,7 @@ Versão 0.1 · 23/11/2026
 ## USGS Earthquake Catalog (FDSN Event Web Service)
 - Consulta: `https://earthquake.usgs.gov/fdsnws/event/1/query`; contagem: `.../count`.
 - Parâmetros usados: `format=geojson`, `starttime`, `endtime`, `minmagnitude`, `orderby=time-asc`, `limit`, `offset`.
-- Limite: `limit` aceita 1 a 20.000; consultas acima de 20.000 eventos devolvem HTTP 400 (docs.html, consultado 23/11/2026).
+- Limite: `limit` acima de 20.000 devolve HTTP 400. A mensagem real do teste (23/11/2026) diz `Valid values are 0 <= limit <= 20000`; a documentação consultada dizia 1 a 20.000, então vale a mensagem da API (OB-16).
 - Taxa: número não publicado; excesso devolve HTTP 429 (aviso na lista realtime-feeds da USGS, jan/2022). Adotar limite conservador (DT-04).
 - Autenticação: não exige.
 
