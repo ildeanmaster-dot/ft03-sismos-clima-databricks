@@ -24,3 +24,19 @@ FROM ft03_sismos_clima.gold.sismo_clima_horario
 UNION ALL
 SELECT 'pressao_hpa', count(*), count_if(pressao_hpa IS NULL), min(pressao_hpa), max(pressao_hpa), round(avg(pressao_hpa), 2)
 FROM ft03_sismos_clima.gold.sismo_clima_horario
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Ver as 5 menores pressões e a elevação
+-- A menor pressão (541.9 hPa) chamou atenção: aqui vemos onde ela ocorreu e a elevação do ponto de grade
+SELECT
+  g.evento_id,  -- sismo da linha
+  g.`local`,  -- lugar do sismo
+  g.hora_utc,  -- hora do clima
+  g.pressao_hpa,  -- pressão na superfície naquela hora
+  c.elevacao_m  -- elevação do ponto de grade usada pelo Open-Meteo, em metros
+FROM ft03_sismos_clima.gold.sismo_clima_horario AS g  -- tabela final
+INNER JOIN ft03_sismos_clima.silver.clima_horario AS c  -- a elevação só existe na silver do clima
+  ON c.evento_id = g.evento_id AND c.hora_utc = g.hora_utc  -- mesma linha nas duas tabelas
+ORDER BY g.pressao_hpa ASC  -- da menor para a maior pressão
+LIMIT 5;  -- só as 5 menores
