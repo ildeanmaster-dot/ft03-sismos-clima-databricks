@@ -40,3 +40,8 @@ INNER JOIN ft03_sismos_clima.silver.clima_horario AS c  -- a elevação só exis
   ON c.evento_id = g.evento_id AND c.hora_utc = g.hora_utc  -- mesma linha nas duas tabelas
 ORDER BY g.pressao_hpa ASC  -- da menor para a maior pressão
 LIMIT 5;  -- só as 5 menores
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Ver tipos da gold
+DESCRIBE TABLE ft03_sismos_clima.gold.sismo_clima_horario;  -- nomes e tipos reais das colunas da gold, para a regra Q-01
