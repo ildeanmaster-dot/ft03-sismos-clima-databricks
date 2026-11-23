@@ -63,3 +63,61 @@ LIMIT 3;
 
 -- DBTITLE 1,Ver tipos da silver.sismos
 DESCRIBE TABLE ft03_sismos_clima.silver.sismos;  -- nomes e tipos das colunas
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Criar silver.clima_horario
+-- Silver do clima: 1 linha por sismo e hora. Aplica T1 (tipos), T2 (nulos) e T3 (deduplicação)
+CREATE OR REPLACE TABLE ft03_sismos_clima.silver.clima_horario AS  -- recria a tabela inteira: reexecutar não duplica
+WITH horas AS (  -- passo 1: uma linha por sismo e hora
+  SELECT
+    regexp_extract(_arquivo, '([^/]+)\\.json$', 1) AS evento_id,  -- a resposta não traz o id: ele vem do nome do arquivo
+    try_cast(hora AS TIMESTAMP) AS hora_utc,  -- T1: texto ISO vira TIMESTAMP; NULL se o texto for inválido (sessão em UTC)
+    CAST(try_element_at(hourly.temperature_2m, pos + 1) AS DOUBLE) AS temperatura_c,  -- mesma posição da hora (pos começa em 0, a lista em 1)
+    CAST(try_element_at(hourly.relative_humidity_2m, pos + 1) AS DOUBLE) AS umidade_pct,  -- T1: vem como inteiro, vira DOUBLE
+    CAST(try_element_at(hourly.precipitation, pos + 1) AS DOUBLE) AS precipitacao_mm,  -- precipitação em mm
+    CAST(try_element_at(hourly.wind_speed_10m, pos + 1) AS DOUBLE) AS vento_kmh,  -- vento em km/h
+    CAST(try_element_at(hourly.surface_pressure, pos + 1) AS DOUBLE) AS pressao_hpa,  -- pressão em hPa
+    CAST(latitude AS DOUBLE) AS latitude_grade,  -- latitude do ponto de grade usado pelo Open-Meteo
+    CAST(longitude AS DOUBLE) AS longitude_grade,  -- longitude do ponto de grade
+    CAST(elevation AS DOUBLE) AS elevacao_m,  -- elevação do ponto de grade, em metros
+    _lido_em  -- usado só para desempatar duplicatas
+  FROM ft03_sismos_clima.bronze.meteo_resposta
+  LATERAL VIEW posexplode(hourly.time) h AS pos, hora  -- uma linha por item de time, com a posição
+)
+SELECT
+  evento_id, hora_utc, temperatura_c, umidade_pct, precipitacao_mm, vento_kmh, pressao_hpa,  -- T2: variável climática nula continua nula, sem preencher
+  latitude_grade, longitude_grade, elevacao_m
+FROM horas
+WHERE evento_id <> ''  -- T2: sem id (o regexp devolve texto vazio quando não casa), a linha é rejeitada
+  AND hora_utc IS NOT NULL  -- T2: sem instante válido, rejeitada
+QUALIFY row_number() OVER (PARTITION BY evento_id, hora_utc ORDER BY _lido_em DESC) = 1;  -- T3: por sismo e hora, fica a leitura mais recente
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Conferir silver.clima_horario
+SELECT
+  count(*) AS linhas,  -- esperado 5376
+  count(DISTINCT evento_id) AS sismos,  -- esperado 224
+  min(hora_utc) AS primeira_hora,  -- primeira hora
+  max(hora_utc) AS ultima_hora,  -- última hora
+  count_if(temperatura_c IS NULL) AS sem_temperatura,  -- nulos de temperatura
+  min(temperatura_c) AS temp_min,  -- menor temperatura
+  max(temperatura_c) AS temp_max  -- maior temperatura
+FROM ft03_sismos_clima.silver.clima_horario;
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Conferir horas por sismo e cruzamento
+SELECT
+  (SELECT min(horas) FROM (SELECT count(*) AS horas FROM ft03_sismos_clima.silver.clima_horario GROUP BY evento_id)) AS horas_min_por_sismo,  -- menor quantidade de horas de um sismo
+  (SELECT max(horas) FROM (SELECT count(*) AS horas FROM ft03_sismos_clima.silver.clima_horario GROUP BY evento_id)) AS horas_max_por_sismo,  -- maior quantidade de horas de um sismo
+  (SELECT count(*) FROM ft03_sismos_clima.silver.sismos s  -- sismos sem nenhuma hora de clima
+     WHERE NOT EXISTS (SELECT 1 FROM ft03_sismos_clima.silver.clima_horario c WHERE c.evento_id = s.evento_id)) AS sismos_sem_clima,
+  (SELECT count(*) FROM (SELECT DISTINCT evento_id FROM ft03_sismos_clima.silver.clima_horario) c  -- clima sem sismo correspondente
+     WHERE NOT EXISTS (SELECT 1 FROM ft03_sismos_clima.silver.sismos s WHERE s.evento_id = c.evento_id)) AS clima_sem_sismo;
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Ver tipos da silver.clima_horario
+DESCRIBE TABLE ft03_sismos_clima.silver.clima_horario;  -- nomes e tipos das colunas

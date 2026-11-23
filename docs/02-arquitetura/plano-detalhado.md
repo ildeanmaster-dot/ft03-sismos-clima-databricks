@@ -136,6 +136,6 @@ Gold lido em Spark e gravado em Parquet Snappy, particionado por ano e mês, em 
 | A5 | Parâmetros do job chegando aos notebooks |
 | A6 | `CREATE CATALOG` no seu workspace (resolvida em 23/11/2026, OB-10) |
 | A7 | Limite numérico de taxa da USGS |
-| A8 | Sintaxe de `posexplode` com índice nas demais listas |
+| A8 | Sintaxe de `posexplode` com índice nas demais listas (resolvida em 23/11/2026, OB-24) |
 | A9 | `endtime` da USGS recebendo só a data: confirmar se o limite é 00:00 UTC do dia informado (por isso a config usa o dia seguinte ao fim, `data_fim_exclusiva`) |
 | A10 | Diretório atual de um notebook dentro do Git folder no serverless (resolvida em 23/11/2026, OB-19) |
