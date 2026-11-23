@@ -138,3 +138,4 @@ Gold lido em Spark e gravado em Parquet Snappy, particionado por ano e mês, em 
 | A7 | Limite numérico de taxa da USGS |
 | A8 | Sintaxe de `posexplode` com índice nas demais listas |
 | A9 | `endtime` da USGS recebendo só a data: confirmar se o limite é 00:00 UTC do dia informado (por isso a config usa o dia seguinte ao fim, `data_fim_exclusiva`) |
+| A10 | Diretório atual (`os.getcwd()`) de um notebook dentro do Git folder no serverless: o notebook `01_extracao_bronze` deduz a raiz do repositório a partir dele |
