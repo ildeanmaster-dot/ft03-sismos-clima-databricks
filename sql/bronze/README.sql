@@ -1,0 +1,1 @@
+-- SQL da camada bronze. A implementar após a aprovação do plano.

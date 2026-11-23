@@ -1,0 +1,4 @@
+# Versões exatas. No Databricks serverless as bibliotecas notebook-scoped são instaladas com %pip (A validar se já vêm no ambiente).
+requests==2.34.2
+urllib3==2.8.0
+pytest==9.2.0

@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.databricks/
+.vscode/*.log
+insumos/*.pdf
+data/raw/
+*.zip
+_to_delete/

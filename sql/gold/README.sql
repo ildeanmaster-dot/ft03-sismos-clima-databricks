@@ -1,0 +1,1 @@
+-- SQL da camada gold. A implementar após a aprovação do plano.

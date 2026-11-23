@@ -1,0 +1,1 @@
+-- SQL da camada silver. A implementar após a aprovação do plano.
