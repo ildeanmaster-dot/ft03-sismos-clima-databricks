@@ -6,8 +6,8 @@ Versão 0.1 · 23/11/2026
 | E0 Validação das APIs | Concluída (23/11/2026) | 224 eventos M5+ em out/2026; 3 sismos x 24 h de clima, 0 nulos |
 | E1 Plano detalhado | Aprovado (23/11/2026) | `docs/02-arquitetura/plano-detalhado.md`; recomendações aceitas para P-01 a P-04, P-07 a P-09 |
 | E2 Ambiente (catálogo, schemas, volumes, Git folder) | Concluída | Catálogo, schemas, volumes e Git folder criados; import de `src/` testado (OB-10 a OB-13); próxima: E3 extração |
-| E3 Extração para bronze | Em andamento | Módulos `config`, `http_client` e `extract` testados no workspace (OB-14 a OB-18); extração de 3 sismos gravou no volume; notebook `01_extracao_bronze` escrito, falta a extração completa (224 sismos) |
-| E4 Silver (desaninhamento SQL) | Pendente | E3 |
+| E3 Extração para bronze | Concluída | Out/2026 extraído: 224 sismos e 224 climas no volume `raw`, relatório sem falhas (OB-14 a OB-19); próxima: E4 bronze e silver |
+| E4 Silver (desaninhamento SQL) | Pendente | Começa pela exploração dos JSON com `read_files` (A1) |
 | E5 Gold (transformações e JOIN) | Pendente | E4 |
 | E6 Qualidade e relatório | Pendente | E5 |
 | E7 Job e comando único | Pendente | E6 |
