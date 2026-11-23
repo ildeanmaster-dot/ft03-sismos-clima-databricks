@@ -6,7 +6,7 @@ Versão 0.1 · 23/11/2026
 | E0 Validação das APIs | Concluída (23/11/2026) | 224 eventos M5+ em out/2026; 3 sismos x 24 h de clima, 0 nulos |
 | E1 Plano detalhado | Aprovado (23/11/2026) | `docs/02-arquitetura/plano-detalhado.md`; recomendações aceitas para P-01 a P-04, P-07 a P-09 |
 | E2 Ambiente (catálogo, schemas, volumes, Git folder) | Concluída | Catálogo, schemas, volumes e Git folder criados; import de `src/` testado (OB-10 a OB-13); próxima: E3 extração |
-| E3 Extração para bronze | Pendente | Plano aprovado |
+| E3 Extração para bronze | Em andamento | `config.py` pronto e testado (OB-14); `http_client.py` em partes (limitador de taxa, depois retentativas); falta `extract.py` |
 | E4 Silver (desaninhamento SQL) | Pendente | E3 |
 | E5 Gold (transformações e JOIN) | Pendente | E4 |
 | E6 Qualidade e relatório | Pendente | E5 |
