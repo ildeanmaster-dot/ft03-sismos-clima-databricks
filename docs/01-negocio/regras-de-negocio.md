@@ -11,4 +11,4 @@ Versão 0.1 · 23/11/2026
 | ID | Regra | Origem | Status | Onde está |
 |---|---|---|---|---|
 | RN-03 | Clima horário no ponto do epicentro (lat/lon da USGS), 24 horas do dia do evento | Pedido do responsável | Pendente | Extração |
-| RN-04 | Chave do JOIN = id do evento enviado na consulta, não a coordenada devolvida (o Open-Meteo ajusta à grade) | Lição do projeto energia-clima (teste 12/11/2026) | Provisório | Gold |
+| RN-04 | Chave do JOIN = id do evento enviado na consulta, não a coordenada devolvida (o Open-Meteo ajusta à grade) | Teste 23/11/2026 (OB-08) e projeto energia-clima | Provisório | Gold |

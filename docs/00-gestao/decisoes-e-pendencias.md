@@ -19,3 +19,8 @@ Versão 0.1 · 23/11/2026
 | P-04 | Comando único: `databricks jobs run-now` pela CLI local, ou bundle | E7 | Ildean | 23/11/2026 |
 | P-05 | Aceite de uma segunda entrega com outro tema pela turma | Entrega | Ildean | 23/11/2026 |
 | P-06 | Valores e nulos do Open-Meteo em epicentro no oceano | E5 | Etapa 0 | 23/11/2026 |
+| P-07 | JOIN: chave técnica `evento_id` (a consulta do clima usa coordenada + dia do evento) | E5 | Ildean | 23/11/2026 |
+| P-08 | Módulos de `src/` no notebook: Git folder do GitHub ou importar pela CLI | E2 | Etapa 2 (teste) | 23/11/2026 |
+| P-09 | Particionar ano/mês uma tabela de ~5 mil linhas: exigência do PDF contra boa prática de tabela pequena | E5 | Ildean | 23/11/2026 |
+
+Aprovação do plano em 23/11/2026 ("aprovado"): P-01 (só out/2026), P-02 (exportar Parquet para `output/`), P-03 (dia UTC), P-04 (`run.sh` com `databricks jobs run-now`), P-07, P-08 (testar Git folder na E2) e P-09 seguem as recomendações. P-05 (aceite da turma) continua com o Ildean.
