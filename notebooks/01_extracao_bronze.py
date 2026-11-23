@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # DBTITLE 1,Preparar import dos módulos
 import os  # consulta a pasta atual do notebook
 import sys  # controla onde o Python procura pacotes
