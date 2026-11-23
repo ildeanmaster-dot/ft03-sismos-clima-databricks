@@ -99,7 +99,7 @@ Relatório em JSON: `gold.export/reports/quality_report.json`. Ele registra id e
 | Q-02 | Sem nulos em `evento_id`, `instante_utc`, `magnitude`, `latitude`, `longitude` | null ratio | erro |
 | Q-03 | Null ratio das 5 variáveis climáticas, por coluna, no relatório | null ratio | aviso |
 | Q-04 | `evento_id` único em `silver.sismos` | unicidade | erro |
-| Q-05 | (`evento_id`, `hora_utc`) único no clima e no gold | unicidade | erro |
+| Q-05a, Q-05b | (`evento_id`, `hora_utc`) único no clima (a) e no gold (b) | unicidade | erro |
 | Q-06 | `magnitude` maior ou igual a 5 | intervalo | erro |
 | Q-07 | Latitude entre -90 e 90, longitude entre -180 e 180 | intervalo | erro |
 | Q-08 | Umidade entre 0 e 100; precipitação maior ou igual a 0 | intervalo | erro |
@@ -108,7 +108,7 @@ Relatório em JSON: `gold.export/reports/quality_report.json`. Ele registra id e
 | Q-11 | Linhas do gold igual a sismos x 24; nenhum sismo sem clima | JOIN | erro |
 | Q-12 | Dia de `hora_utc` igual a `data_utc` do sismo | consistência | erro |
 
-Limites físicos de temperatura, vento e pressão ficam fora até olharmos os dados reais (**A validar**). Política de falha: qualquer regra de nível erro reprova a task, o gold não é exportado e o relatório continua salvo.
+Limites físicos de temperatura, vento e pressão ficam fora: os dados reais foram vistos em 23/11/2026 (OB-29) e não há fonte oficial adotada para esses limites; eles aparecem só como informação no relatório. As regras em SQL gravam o resultado na tabela `gold.qualidade_regras` (`sql/quality/02_regras.sql`); `quality.py` lê essa tabela, soma Q-01 (schema), Q-03 (nulos por coluna) e Q-10 (contagem da USGS) e monta o relatório JSON. Política de falha: qualquer regra de nível erro reprova a task, o gold não é exportado e o relatório continua salvo.
 
 ## 5. Extração: taxa e retentativas
 | Item | Valor proposto | Base |
