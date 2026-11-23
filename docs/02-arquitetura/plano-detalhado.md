@@ -131,7 +131,7 @@ Gold lido em Spark e gravado em Parquet Snappy, particionado por ano e mês, em 
 |---|---|
 | A1 | `read_files` com JSON aninhado no serverless (resolvida em 23/11/2026, OB-20) |
 | A2 | Git folder ou import dos módulos no notebook (resolvida em 23/11/2026, OB-13) |
-| A3 | `SNAPPY` na propriedade da tabela gerenciada |
+| A3 | `SNAPPY` na propriedade da tabela gerenciada (propriedade aceita e registrada em 23/11/2026, OB-28; a prova no rodapé do arquivo Parquet fica para a exportação, E8) |
 | A4 | `partitionBy` ao gravar Parquet no volume |
 | A5 | Parâmetros do job chegando aos notebooks |
 | A6 | `CREATE CATALOG` no seu workspace (resolvida em 23/11/2026, OB-10) |
