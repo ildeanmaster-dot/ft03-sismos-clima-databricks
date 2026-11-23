@@ -53,3 +53,77 @@ def test_parametros_meteo_longitude_antes_da_latitude():
     assert p["hourly"].split(",") == [
         "temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m", "surface_pressure",
     ]
+
+
+# ---- extrair: gravação no volume (usa pasta temporária e clientes falsos) ----
+import json  # noqa: E402
+
+import pytest  # noqa: E402
+
+from sismos_clima.extract import ErroExtracao, METEO_URL, extrair  # noqa: E402
+from sismos_clima.http_client import ErroPermanente  # noqa: E402
+
+
+class ClienteFalso:
+    """Responde por url; um valor Exception é levantado em vez de devolvido."""
+
+    def __init__(self, respostas):
+        self.respostas = respostas
+        self.chamadas = []
+
+    def get_json(self, url, params=None):
+        self.chamadas.append((url, params))
+        resposta = self.respostas[url]
+        if isinstance(resposta, Exception):
+            raise resposta
+        return resposta
+
+
+def _evento(id_, ms=1790818160875):
+    return {"id": id_, "properties": {"time": ms}, "geometry": {"coordinates": [68.7436, 36.1078, 55.0]}}
+
+
+def _usgs(total, eventos):
+    return ClienteFalso({
+        "https://earthquake.usgs.gov/fdsnws/event/1/count": {"count": total, "maxAllowed": 20000},
+        "https://earthquake.usgs.gov/fdsnws/event/1/query": {"type": "FeatureCollection", "features": eventos},
+    })
+
+
+def test_extrair_grava_arquivos_e_relatorio(tmp_path):
+    usgs = _usgs(2, [_evento("a1"), _evento("b2")])
+    meteo = ClienteFalso({METEO_URL: {"hourly": {"time": []}}})
+    relatorio = extrair(carregar_configuracao({}), usgs, meteo, tmp_path)
+    assert relatorio["completo"] is True and relatorio["chamadas"] == 4
+    assert (tmp_path / "usgs" / "eventos_2026-10-01_2026-10-31.json").exists()
+    assert sorted(p.name for p in (tmp_path / "open_meteo").iterdir()) == ["a1.json", "b2.json"]
+    assert json.loads((tmp_path / "extracao_relatorio.json").read_text())["climas_gravados"] == 2
+
+
+def test_extrair_falha_de_um_clima_salva_relatorio_e_levanta(tmp_path):
+    usgs = _usgs(1, [_evento("a1")])
+    meteo = ClienteFalso({METEO_URL: ErroPermanente("HTTP 400")})
+    with pytest.raises(ErroExtracao):
+        extrair(carregar_configuracao({}), usgs, meteo, tmp_path)
+    relatorio = json.loads((tmp_path / "extracao_relatorio.json").read_text())
+    assert relatorio["falhas"][0]["evento_id"] == "a1" and relatorio["completo"] is False
+
+
+def test_extrair_recusa_periodo_acima_do_maximo(tmp_path):
+    with pytest.raises(ErroExtracao):
+        extrair(carregar_configuracao({}), _usgs(20001, []), ClienteFalso({}), tmp_path)
+
+
+def test_extrair_recusa_id_com_barra(tmp_path):
+    usgs = _usgs(1, [_evento("../x")])
+    meteo = ClienteFalso({METEO_URL: {}})
+    with pytest.raises(ErroExtracao):
+        extrair(carregar_configuracao({}), usgs, meteo, tmp_path)
+    assert meteo.chamadas == []
+    assert not (tmp_path.parent / "x.json").exists()
+
+
+def test_extrair_com_limite_nao_marca_completo(tmp_path):
+    usgs = _usgs(224, [_evento("a1")])
+    meteo = ClienteFalso({METEO_URL: {}})
+    assert extrair(carregar_configuracao({}), usgs, meteo, tmp_path, limite=1)["completo"] is False
