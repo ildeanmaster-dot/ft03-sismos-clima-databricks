@@ -9,7 +9,7 @@ Versão 0.1 · 23/11/2026
 | E3 Extração para bronze | Concluída | Out/2026 extraído: 224 sismos e 224 climas no volume `raw`, relatório sem falhas (OB-14 a OB-19); próxima: E4 bronze e silver |
 | E4 Bronze e silver (desaninhamento SQL) | Concluída | Bronze, `silver.sismos` (224) e `silver.clima_horario` (5.376 = 224 x 24) criadas e conferidas (OB-20 a OB-25); próxima: E5 gold |
 | E5 Gold (transformações e JOIN) | Concluída | `gold.sismo_clima_horario` com 5.376 linhas (224 x 24), T4 e T5, partição ano/mês e propriedade Snappy registrada (OB-27, OB-28); próxima: E6 qualidade |
-| E6 Qualidade e relatório | Em andamento | Parte 1 concluída (OB-29); parte 2: `sql/quality/02_regras.sql` escrita (tabela `gold.qualidade_regras`), aguardando execução; faltam `quality.py` com testes (Q-01, Q-03, Q-10) e o relatório JSON |
+| E6 Qualidade e relatório | Em andamento | Parte 1 concluída (OB-29); parte 2: `gold.qualidade_regras` com 10 regras aprovadas (OB-30), teste com dados ruins aguardando execução; faltam `quality.py` com testes (Q-01, Q-03, Q-10) e o relatório JSON |
 | E7 Job e comando único | Pendente | E6 |
 | E8 Exportação Parquet e README final | Pendente | E7 |
 

@@ -69,3 +69,33 @@ FROM (
 SELECT regra_id, descricao, nivel, verificados, violacoes, status  -- resultado de cada regra
 FROM ft03_sismos_clima.gold.qualidade_regras
 ORDER BY regra_id;  -- ordem das regras
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Testar as regras com dados ruins
+-- Teste negativo: aplica a mesma expressão de cada regra a poucas linhas inventadas, com defeito de propósito
+-- Se a regra detecta, 'encontradas' é igual a 'esperadas'. Isto testa a expressão, não as tabelas reais
+SELECT regra_id, encontradas, esperadas,  -- quanto a regra achou e quanto devia achar
+  CASE WHEN encontradas = esperadas THEN 'detectou' ELSE 'falhou' END AS resultado  -- a regra funciona se os dois batem
+FROM (
+  SELECT 'Q-02' AS regra_id,
+    count_if(evento_id IS NULL OR magnitude IS NULL) AS encontradas,  -- mesma ideia da Q-02: algum campo nulo
+    2 AS esperadas  -- 2 linhas têm nulo
+  FROM VALUES ('x', 1.0), (CAST(NULL AS STRING), 2.0), ('y', CAST(NULL AS DOUBLE)) AS t(evento_id, magnitude)
+  UNION ALL
+  SELECT 'Q-04', count(*) - count(DISTINCT evento_id), 1  -- 3 linhas e 2 ids distintos: 1 repetida
+  FROM VALUES ('a'), ('a'), ('b') AS t(evento_id)
+  UNION ALL
+  SELECT 'Q-06', count_if(magnitude < 5), 2  -- 4.9 e 3.0 estão abaixo de 5
+  FROM VALUES (4.9), (5.0), (3.0) AS t(magnitude)
+  UNION ALL
+  SELECT 'Q-07', count_if(latitude NOT BETWEEN -90 AND 90 OR longitude NOT BETWEEN -180 AND 180), 2  -- latitude 91 e longitude 181
+  FROM VALUES (91.0, 0.0), (0.0, 181.0), (10.0, 20.0) AS t(latitude, longitude)
+  UNION ALL
+  SELECT 'Q-08', count_if(umidade_pct NOT BETWEEN 0 AND 100 OR precipitacao_mm < 0), 2  -- umidade 101 e chuva -1
+  FROM VALUES (101.0, 0.0), (50.0, -1.0), (50.0, 0.0) AS t(umidade_pct, precipitacao_mm)
+  UNION ALL
+  SELECT 'Q-12', count_if(CAST(hora_utc AS DATE) <> data_utc), 1  -- a segunda hora já é do dia 02
+  FROM VALUES (TIMESTAMP'2026-10-01 23:00:00', DATE'2026-10-01'), (TIMESTAMP'2026-10-02 00:00:00', DATE'2026-10-01') AS t(hora_utc, data_utc)
+)
+ORDER BY regra_id;  -- ordem das regras
