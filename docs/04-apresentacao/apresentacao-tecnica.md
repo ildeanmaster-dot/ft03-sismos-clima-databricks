@@ -15,7 +15,7 @@ Versão 0.1 · 24/11/2026 · roteiro para a equipe técnica. Todos os números v
 | 9 | Orquestração | Job, `run.sh` e tempo de cada tarefa |
 | 10 | Reprocessamento | O erro real que apareceu e a correção |
 | 11 | Resultados | Números finais e requisitos |
-| 12 | Demonstração ao vivo | Comandos e consultas |
+| 12 | Demonstração ao vivo | Notebook `notebooks/validacao_do_pipeline` (só Databricks) ou comandos do terminal |
 | 13 | Limitações | O que ficou em aberto |
 
 ## 1. O problema

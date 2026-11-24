@@ -6,7 +6,20 @@ Regras para a apresentação:
 - Não use a seta para cima para repetir um comando com argumento diferente.
 - O aviso "Databricks CLI v1.17.0 found... Executing CLI v1.17.0" é normal: é o redirecionamento do 0.18 do pip.
 
-## 1. Antes da apresentação (no dia, uma vez)
+## 0. Apresentação só pelo Databricks (sem terminal)
+Testado em 24/11/2026 (OB-50). Tudo fica no workspace:
+
+| # | Onde | O que fazer | Resultado esperado |
+|---|---|---|---|
+| W1 | Workspace → Home → Drafts → `ft03-sismos-clima-databricks` → botão `main` → **Pull** | Deixa o Git folder igual ao GitHub | Pull sem conflito |
+| W2 | **Jobs & Pipelines** → `ft03-sismos-clima-pipeline` → **Run now** | Dispara o pipeline (cerca de 4 min 35 s) | Execução nova, lançamento `Manually`, 7 tarefas `Succeeded` |
+| W3 | Git folder → `notebooks/validacao_do_pipeline`, compute **Serverless**, **Run all** | Notebook da apresentação: texto do que falar e consultas de cada parte, todas só de leitura | Mesmos números das OB-50 (224, 5.376, 15/15, SNAPPY) |
+| W4 | Página da execução: abas **List**, **Graph** e **Timeline**; painel **Parameters** | Mostra o resultado e o tempo de cada tarefa | 7 tarefas `Succeeded` |
+| W5 | Opcional: seta ao lado de Run now → **Run now with different parameters** → `data_inicio` 2026-10-31, `data_fim` 2026-10-01 | Falha controlada, sem alterar dados | `extracao` falha, as outras 6 não rodam |
+
+Cuidados: não execute as células de `01_extracao_bronze` (a célula Executar extração chama as APIs e limpa o `raw`) nem a célula 2 de `05_exportacao` (regrava o Parquet); notebook Python precisa de **Serverless**, não de SQL warehouse; os notebooks soltos na Home (`00_validacao_apis`, `01_ambiente`, `02_teste_import`, `03_explorar_bronze`) são rascunhos fora do Git.
+
+## 1. Antes da apresentação pelo terminal (no dia, uma vez)
 | # | Comando | O que faz | Resultado esperado |
 |---|---|---|---|
 | A1 | `cd D:\Portifolio\DesafioPythonFT03SismosClima` | Entra na pasta do projeto | Prompt `PS D:\Portifolio\DesafioPythonFT03SismosClima>` |
@@ -17,7 +30,7 @@ Regras para a apresentação:
 | A6 | `.venv\Scripts\pip install -r requirements.txt` | Instala requests 2.34.2, urllib3 2.8.0 e pytest 9.2.0 | `Successfully installed ...` |
 | A7 | Abrir `portal\index.html` no navegador | Portal com a apresentação técnica e a execução animada | Painel com 11/11, 10/10, 1 pendência, 5 débitos |
 
-## 2. Durante a apresentação
+## 2. Durante a apresentação pelo terminal
 Ordem sugerida: dispare o pipeline (passo 1) logo no começo, porque leva de 4 a 5 minutos (265 a 311 s nas execuções de 24/11/2026). Enquanto ele roda, mostre a **Execução animada** e as partes 1 a 8 da **Apresentação técnica**.
 
 | # | Comando ou lugar | O que faz | Resultado esperado | Parte da apresentação |
