@@ -36,6 +36,11 @@
       "task_key": "relatorio",
       "depends_on": [ { "task_key": "regras" } ],
       "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/notebooks/04_qualidade", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "exportacao",
+      "depends_on": [ { "task_key": "relatorio" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/notebooks/05_exportacao", "source": "WORKSPACE" }
     }
   ]
 }

@@ -12,3 +12,8 @@ _to_delete/
 
 # job renderizado com o caminho real do workspace (contem e-mail)
 jobs/*.local.json
+
+# arquivos de controle que o Databricks grava junto com o Parquet (copiados para output/ por databricks fs cp)
+output/dataset/**/_SUCCESS
+output/dataset/**/_committed_*
+output/dataset/**/_started_*

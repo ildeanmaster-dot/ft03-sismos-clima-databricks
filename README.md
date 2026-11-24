@@ -39,7 +39,7 @@ Catálogo Unity Catalog: `ft03_sismos_clima` (schemas `bronze`, `silver`, `gold`
 | `config/` | Parâmetros não secretos |
 
 ## Como executar
-Comando único: `run.sh` dispara o job `ft03-sismos-clima-pipeline` (6 tarefas: extração, bronze, silver, gold, regras, relatório) e espera o fim.
+Comando único: `run.sh` dispara o job `ft03-sismos-clima-pipeline` (7 tarefas: extração, bronze, silver, gold, regras, relatório e exportação do Parquet Snappy) e espera o fim.
 
 Pré-requisitos: Databricks CLI 0.218 ou mais nova, perfil autenticado (`databricks auth login --host <url do workspace> --profile ft03`) e o job criado no workspace (`jobs/ft03_pipeline.json`).
 

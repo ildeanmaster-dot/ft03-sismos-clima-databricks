@@ -1,5 +1,5 @@
 # output/
-- `dataset/ano=AAAA/mes=MM/*.parquet` — camada final exportada do gold, Parquet com Snappy.
-- `reports/` — relatório de qualidade em JSON.
+- `dataset/ano=AAAA/mes=M/*.snappy.parquet`: camada final exportada da gold pelo notebook `05_exportacao`, Parquet com Snappy (provado no rodapé, OB-41). A pasta do mês usa o número sem zero à esquerda (`mes=10`; janeiro seria `mes=1`).
+- `reports/quality_report.json`: relatório de qualidade da execução que gerou o dataset.
 
-Ainda vazio: o pipeline não rodou (23/11/2026). Se a cópia do Parquet para cá será versionada: **A validar** (P-02).
+Origem: volume `/Volumes/ft03_sismos_clima/gold/export/` (`dataset/` e `reports/`), copiado com `databricks fs cp -r`. Os arquivos de controle do Databricks (`_SUCCESS`, `_committed_*`, `_started_*`) não são versionados (`.gitignore`).

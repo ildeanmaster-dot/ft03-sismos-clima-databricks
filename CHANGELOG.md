@@ -6,6 +6,8 @@
 - `extract.limpar_raw`: a extração apaga os .json antigos de `raw/usgs` e `raw/open_meteo` antes de gravar (DT-09, D-06); 3 testes novos, 34 no total.
 - DT-09 validado no workspace: 226 arquivos antigos removidos e outubro inteiro restaurado, 15/15 regras (OB-39).
 - `run.sh` (comando único) dispara o job com `jobs/run_padrao.json` e espera o fim (DT-01, OB-40).
+- `notebooks/05_exportacao`: Parquet Snappy particionado por ano/mês em `gold.export/dataset`, com prova no rodapé (OB-41); tarefa `exportacao` no job, 7 tarefas (OB-42).
+- `output/`: Parquet Snappy de out/2026 (5.376 linhas) e `quality_report.json` da mesma execução; arquivos de controle do Databricks fora do Git (OB-43).
 
 ## 0.1.0 — 23/11/2026
 - Estrutura inicial do repositório, documentação base (gestão, negócio, arquitetura, fontes) e célula da Etapa 0 (`notebooks/00_validacao_apis.py`).

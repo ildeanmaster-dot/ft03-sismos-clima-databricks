@@ -1,0 +1,240 @@
+{
+  "execucao_id": "3b350a31-e184-413b-a4f5-9a7d8091b8ba",
+  "iniciado_em_utc": "2026-11-24T10:42:37.998114+00:00",
+  "finalizado_em_utc": "2026-11-24T10:42:43.102598+00:00",
+  "periodo": {
+    "inicio": "2026-10-01",
+    "fim": "2026-10-31"
+  },
+  "magnitude_minima": 5.0,
+  "contagens": {
+    "count_usgs": 224,
+    "bronze_usgs_eventos": 224,
+    "silver_sismos": 224,
+    "bronze_clima_horas": 5376,
+    "silver_clima_horas": 5376,
+    "gold_linhas": 5376
+  },
+  "rejeitados": {
+    "sismos": 0,
+    "horas_de_clima": 0
+  },
+  "resumo": {
+    "regras": 15,
+    "aprovadas": 15,
+    "reprovadas": 0,
+    "avisos": 0
+  },
+  "aprovado": true,
+  "regras": [
+    {
+      "regra_id": "Q-01a",
+      "descricao": "Colunas e tipos de silver.sismos iguais ao schema do plano",
+      "tipo": "schema",
+      "nivel": "erro",
+      "verificados": 12,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-01b",
+      "descricao": "Colunas e tipos de silver.clima_horario iguais ao schema do plano",
+      "tipo": "schema",
+      "nivel": "erro",
+      "verificados": 10,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-01c",
+      "descricao": "Colunas e tipos de gold.sismo_clima_horario iguais ao schema do plano",
+      "tipo": "schema",
+      "nivel": "erro",
+      "verificados": 22,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-02",
+      "descricao": "Sem nulos em evento_id, instante_utc, magnitude, latitude e longitude (silver.sismos)",
+      "tipo": "null ratio",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-03",
+      "descricao": "Variáveis climáticas sem nulos na gold (taxa por coluna no relatório)",
+      "tipo": "null ratio",
+      "nivel": "aviso",
+      "verificados": 5,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-04",
+      "descricao": "evento_id único em silver.sismos",
+      "tipo": "unicidade",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-05a",
+      "descricao": "(evento_id, hora_utc) único em silver.clima_horario",
+      "tipo": "unicidade",
+      "nivel": "erro",
+      "verificados": 5376,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-05b",
+      "descricao": "(evento_id, hora_utc) único em gold.sismo_clima_horario",
+      "tipo": "unicidade",
+      "nivel": "erro",
+      "verificados": 5376,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-06",
+      "descricao": "magnitude maior ou igual a 5 (silver.sismos)",
+      "tipo": "intervalo",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-07",
+      "descricao": "Latitude entre -90 e 90 e longitude entre -180 e 180 (silver.sismos)",
+      "tipo": "intervalo",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-08",
+      "descricao": "Umidade entre 0 e 100 e precipitação maior ou igual a 0 (silver.clima_horario)",
+      "tipo": "intervalo",
+      "nivel": "erro",
+      "verificados": 5376,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-09",
+      "descricao": "24 horas por sismo (gold)",
+      "tipo": "completude",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-10",
+      "descricao": "Sismos na silver iguais ao count da USGS",
+      "tipo": "completude",
+      "nivel": "erro",
+      "verificados": 224,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-11",
+      "descricao": "Linhas da gold = sismos x 24 e nenhum sismo sem clima",
+      "tipo": "JOIN",
+      "nivel": "erro",
+      "verificados": 5376,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    },
+    {
+      "regra_id": "Q-12",
+      "descricao": "Dia de hora_utc igual a data_utc do sismo (gold)",
+      "tipo": "consistência",
+      "nivel": "erro",
+      "verificados": 5376,
+      "violacoes": 0,
+      "status": "aprovada",
+      "detalhes": []
+    }
+  ],
+  "nulos_clima": [
+    {
+      "coluna": "temperatura_c",
+      "nulos": 0,
+      "total": 5376,
+      "taxa": 0.0
+    },
+    {
+      "coluna": "umidade_pct",
+      "nulos": 0,
+      "total": 5376,
+      "taxa": 0.0
+    },
+    {
+      "coluna": "precipitacao_mm",
+      "nulos": 0,
+      "total": 5376,
+      "taxa": 0.0
+    },
+    {
+      "coluna": "vento_kmh",
+      "nulos": 0,
+      "total": 5376,
+      "taxa": 0.0
+    },
+    {
+      "coluna": "pressao_hpa",
+      "nulos": 0,
+      "total": 5376,
+      "taxa": 0.0
+    }
+  ],
+  "estatisticas_clima": {
+    "temperatura_c": {
+      "minimo": -19.6,
+      "maximo": 37.0,
+      "media": 21.158351934523917
+    },
+    "umidade_pct": {
+      "minimo": 4.0,
+      "maximo": 100.0,
+      "media": 77.43973214285714
+    },
+    "precipitacao_mm": {
+      "minimo": 0.0,
+      "maximo": 25.6,
+      "media": 0.188058035714287
+    },
+    "vento_kmh": {
+      "minimo": 0.0,
+      "maximo": 96.5,
+      "media": 21.545052083333356
+    },
+    "pressao_hpa": {
+      "minimo": 541.9,
+      "maximo": 1028.8,
+      "media": 980.508147321427
+    }
+  }
+}
