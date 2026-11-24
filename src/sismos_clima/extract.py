@@ -5,6 +5,7 @@ Funções puras montam os parâmetros das chamadas a partir da configuração e 
     usgs/eventos_<inicio>_<fim>.json   uma resposta GeoJSON com todos os sismos
     open_meteo/<evento_id>.json        uma resposta do Open-Meteo por sismo
     extracao_relatorio.json            números e falhas da execução
+Antes de gravar, `extrair` apaga os .json antigos de `usgs/` e `open_meteo/` (ver `limpar_raw`).
 """
 from __future__ import annotations  # permite anotações de tipo modernas em Python 3.9+
 
@@ -87,6 +88,26 @@ def _id_seguro(evento_id: str) -> str:
     return str(evento_id)  # id aceito
 
 
+SUBPASTAS_RAW = ("usgs", "open_meteo")  # as únicas pastas de `raw` que a extração recria a cada execução
+
+
+def limpar_raw(pasta_raw: Path) -> int:
+    """Apaga os .json de execuções anteriores em `usgs/` e `open_meteo/`; devolve quantos apagou.
+
+    Sem isso, rodar outro período deixaria arquivos antigos no volume e a bronze, que lê a pasta
+    inteira, misturaria períodos (DT-09). Outras pastas de `raw` (ex.: `_teste`) não são tocadas.
+    """
+    apagados = 0  # contador para o relatório
+    for nome in SUBPASTAS_RAW:  # só as duas pastas de dados brutos
+        pasta = pasta_raw / nome  # caminho da subpasta
+        if not pasta.is_dir():  # primeira execução: a pasta ainda não existe
+            continue  # nada a apagar
+        for arquivo in pasta.glob("*.json"):  # só arquivos .json, nunca subpastas
+            arquivo.unlink()  # apaga o arquivo
+            apagados += 1  # conta
+    return apagados  # quantidade apagada
+
+
 def extrair(
     config: Configuracao,  # período, magnitude e catálogo
     cliente_usgs: ClienteHttp,  # cliente já configurado com o intervalo da USGS
@@ -109,6 +130,7 @@ def extrair(
         raise ErroExtracao(f"{total} sismos excedem o máximo de {maximo} por consulta; reduza o período")
     geo = cliente_usgs.get_json(f"{USGS_BASE}/query", params=parametros_query_usgs(config, limite))  # 2ª chamada: os sismos
     eventos: List[Mapping[str, Any]] = geo["features"]  # lista de sismos do GeoJSON
+    removidos = limpar_raw(pasta_raw)  # só depois de a USGS responder: falha de rede não apaga o que já existe
     gravar_json(geo, pasta_raw / "usgs" / f"eventos_{config.data_inicio}_{config.data_fim}.json")  # guarda o bruto
     falhas: List[Dict[str, str]] = []  # sismos cujo clima falhou
     climas = 0  # climas gravados com sucesso
@@ -128,6 +150,7 @@ def extrair(
         "periodo": {"inicio": str(config.data_inicio), "fim": str(config.data_fim)},  # período pedido
         "magnitude_minima": config.magnitude_minima,  # filtro de magnitude
         "count_usgs": total,  # quantidade informada pelo `count`
+        "arquivos_antigos_removidos": removidos,  # .json de períodos anteriores apagados de `raw`
         "limite_teste": limite,  # None em execução normal
         "eventos_gravados": len(eventos),  # sismos recebidos e gravados
         "climas_gravados": climas,  # arquivos de clima gravados

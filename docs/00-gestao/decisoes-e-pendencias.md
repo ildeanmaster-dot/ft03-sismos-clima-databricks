@@ -9,6 +9,7 @@ Versão 0.1 · 23/11/2026
 | D-03 | Projeto independente de `ft03-pipeline-energia-clima`, sem alterar aquele repositório | 23/11/2026 | Aprovada pelo responsável |
 | D-04 | Repositório público na conta ildeanmaster-dot, criado pelo responsável | 23/11/2026 | Aprovada pelo responsável |
 | D-05 | Tabela Delta gerenciada com `delta.parquet.compression.codec = SNAPPY` (UC managed nasce ZSTD) | 23/11/2026 | Proposta (doc table-properties, 17/11/2026) |
+| D-06 | Corrigir o reprocessamento (DT-09) limpando `raw/usgs` e `raw/open_meteo` no início da gravação da extração, e não filtrando na bronze | 24/11/2026 | Aprovada pelo responsável |
 
 ## 2. Pendências
 | # | Pendência | Bloqueia | Com quem | Desde |

@@ -1,0 +1,41 @@
+{
+  "name": "ft03-sismos-clima-pipeline",
+  "max_concurrent_runs": 1,
+  "parameters": [
+    { "name": "data_inicio", "default": "2026-10-01" },
+    { "name": "data_fim", "default": "2026-10-31" },
+    { "name": "magnitude_minima", "default": "5" },
+    { "name": "catalogo", "default": "ft03_sismos_clima" }
+  ],
+  "tasks": [
+    {
+      "task_key": "extracao",
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/notebooks/01_extracao_bronze", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "bronze",
+      "depends_on": [ { "task_key": "extracao" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/sql/bronze/01_bronze", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "silver",
+      "depends_on": [ { "task_key": "bronze" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/sql/silver/01_silver", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "gold",
+      "depends_on": [ { "task_key": "silver" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/sql/gold/01_gold", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "regras",
+      "depends_on": [ { "task_key": "gold" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/sql/quality/02_regras", "source": "WORKSPACE" }
+    },
+    {
+      "task_key": "relatorio",
+      "depends_on": [ { "task_key": "regras" } ],
+      "notebook_task": { "notebook_path": "{{RAIZ_GIT}}/notebooks/04_qualidade", "source": "WORKSPACE" }
+    }
+  ]
+}

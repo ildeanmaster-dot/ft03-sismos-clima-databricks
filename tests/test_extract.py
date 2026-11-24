@@ -60,7 +60,7 @@ import json  # noqa: E402
 
 import pytest  # noqa: E402
 
-from sismos_clima.extract import ErroExtracao, METEO_URL, extrair  # noqa: E402
+from sismos_clima.extract import ErroExtracao, METEO_URL, extrair, limpar_raw  # noqa: E402
 from sismos_clima.http_client import ErroPermanente  # noqa: E402
 
 
@@ -127,3 +127,32 @@ def test_extrair_com_limite_nao_marca_completo(tmp_path):
     usgs = _usgs(224, [_evento("a1")])
     meteo = ClienteFalso({METEO_URL: {}})
     assert extrair(carregar_configuracao({}), usgs, meteo, tmp_path, limite=1)["completo"] is False
+
+
+def test_extrair_apaga_arquivos_de_periodo_anterior(tmp_path):
+    (tmp_path / "usgs").mkdir()
+    (tmp_path / "open_meteo").mkdir()
+    (tmp_path / "_teste").mkdir()
+    (tmp_path / "usgs" / "eventos_2026-09-01_2026-09-30.json").write_text("{}")
+    (tmp_path / "open_meteo" / "velho.json").write_text("{}")
+    (tmp_path / "_teste" / "fica.json").write_text("{}")
+    usgs = _usgs(1, [_evento("a1")])
+    meteo = ClienteFalso({METEO_URL: {"hourly": {"time": []}}})
+    relatorio = extrair(carregar_configuracao({}), usgs, meteo, tmp_path)
+    assert relatorio["arquivos_antigos_removidos"] == 2
+    assert sorted(p.name for p in (tmp_path / "usgs").iterdir()) == ["eventos_2026-10-01_2026-10-31.json"]
+    assert sorted(p.name for p in (tmp_path / "open_meteo").iterdir()) == ["a1.json"]
+    assert (tmp_path / "_teste" / "fica.json").exists()
+
+
+def test_extrair_nao_apaga_nada_se_a_usgs_falha(tmp_path):
+    (tmp_path / "usgs").mkdir()
+    (tmp_path / "usgs" / "eventos_antigo.json").write_text("{}")
+    usgs = ClienteFalso({"https://earthquake.usgs.gov/fdsnws/event/1/count": ErroPermanente("HTTP 400")})
+    with pytest.raises(ErroPermanente):
+        extrair(carregar_configuracao({}), usgs, ClienteFalso({}), tmp_path)
+    assert (tmp_path / "usgs" / "eventos_antigo.json").exists()
+
+
+def test_limpar_raw_sem_pastas_devolve_zero(tmp_path):
+    assert limpar_raw(tmp_path) == 0

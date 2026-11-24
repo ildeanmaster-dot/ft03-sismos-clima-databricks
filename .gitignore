@@ -9,3 +9,6 @@ insumos/*.pdf
 data/raw/
 *.zip
 _to_delete/
+
+# job renderizado com o caminho real do workspace (contem e-mail)
+jobs/*.local.json

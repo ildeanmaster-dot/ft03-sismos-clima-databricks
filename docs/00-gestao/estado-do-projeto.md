@@ -10,7 +10,7 @@ Versão 0.1 · 23/11/2026
 | E4 Bronze e silver (desaninhamento SQL) | Concluída | Bronze, `silver.sismos` (224) e `silver.clima_horario` (5.376 = 224 x 24) criadas e conferidas (OB-20 a OB-25); próxima: E5 gold |
 | E5 Gold (transformações e JOIN) | Concluída | `gold.sismo_clima_horario` com 5.376 linhas (224 x 24), T4 e T5, partição ano/mês e propriedade Snappy registrada (OB-27, OB-28); próxima: E6 qualidade |
 | E6 Qualidade e relatório | Concluída | 15 regras aprovadas e `quality_report.json` gravado no volume `gold.export` (OB-29 a OB-33); falta teste negativo de 4 regras (Q-05a, Q-05b, Q-09, Q-11); próxima: E7 job |
-| E7 Job e comando único | Pendente | Pronta para começar (E6 concluída) |
+| E7 Job e comando único | Em andamento (24/11/2026) | Job `ft03-sismos-clima-pipeline` criado (OB-35), execução 1 com 6 tarefas `SUCCESS` (OB-36) e A5 resolvida (OB-38); falta corrigir o reprocessamento do `raw` (DT-09), restaurar outubro inteiro, criar o `run.sh` (DT-01) e a tarefa de exportação (E8) |
 | E8 Exportação Parquet e README final | Pendente | E7 |
 
 | Componente | Situação | Evidência |

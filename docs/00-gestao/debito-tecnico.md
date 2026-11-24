@@ -11,5 +11,6 @@ Versão 0.1 · 23/11/2026
 | DT-06 | Esboços `notebooks/02_silver.sql` e `notebooks/03_gold.sql` redundantes com `sql/silver` e `sql/gold` | Dois lugares para a mesma lógica | Estrutura | Baixa | Remover os esboços na limpeza final (exige permissão de exclusão na pasta) | E8 | Aberto |
 | DT-07 | A regra Q-06 em `sql/quality/02_regras.sql` usa magnitude mínima 5 fixa | Rodar com outra `magnitude_minima` reprova a Q-06 sem ser erro de dado | Código | Média | Ler `magnitude_minima` do job depois de validar A5 | E7, A5 | Aberto |
 | DT-08 | `04_qualidade` lê `gold.qualidade_regras` sem saber quando ela foi gerada | Se `02_regras` não rodar antes, o relatório usa regras defasadas | Código | Média | Garantir a ordem no job (E7) e gravar `executado_em` na tabela | E7 | Aberto |
+| DT-09 | A extração não limpava o volume `raw`: arquivos de períodos anteriores continuavam e a bronze lê a pasta inteira | Rodar outro período mistura eventos antigos na bronze; a Q-10 reprova (OB-38) e a silver só se salva pela deduplicação | Código | Média | `limpar_raw` em `extract.py` apaga os .json de `usgs/` e `open_meteo/` depois de a USGS responder (D-06); 34 testes passam; falta validar `Path.unlink` no volume do workspace | E7 | Em validação (24/11/2026) |
 
-Resumo: 7 abertos (1 Alta, 3 Média, 3 Baixa) e 1 resolvido (DT-02).
+Resumo: 8 abertos (1 Alta, 4 Média, 3 Baixa) e 1 resolvido (DT-02).
