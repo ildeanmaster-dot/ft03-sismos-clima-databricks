@@ -10,6 +10,7 @@
 - `output/`: Parquet Snappy de out/2026 (5.376 linhas) e `quality_report.json` da mesma execução; arquivos de controle do Databricks fora do Git (OB-43).
 - Teste negativo de Q-05a, Q-05b, Q-09 e Q-11 em `02_regras`: as 10 regras SQL detectam defeito (OB-44).
 - Requisitos revisados com evidência: 15 de 15 atendidos, ressalvas registradas (OB-45); `tests/README.md` e README completo na ordem planejada.
+- Esboços `notebooks/02_silver.sql` e `notebooks/03_gold.sql` removidos (DT-06).
 
 ## 0.1.0 — 23/11/2026
 - Estrutura inicial do repositório, documentação base (gestão, negócio, arquitetura, fontes) e célula da Etapa 0 (`notebooks/00_validacao_apis.py`).
