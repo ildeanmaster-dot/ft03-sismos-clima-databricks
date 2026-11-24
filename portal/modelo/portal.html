@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITULO}}</title>
+<style>
+/*{{CSS}}*/
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<div class="casca">
+  <nav class="menu" id="menu" aria-label="Seções do portal">
+    <div class="menu-topo">
+      <img id="logo" alt="" class="logo">
+      <div class="menu-projeto" id="menuProjeto"></div>
+    </div>
+    <ul id="menuLista"></ul>
+    <div class="menu-rodape" id="menuRodape"></div>
+  </nav>
+  <div class="area">
+    <header class="topo">
+      <button class="botao-menu" id="botaoMenu" aria-label="Abrir menu" aria-expanded="false">Menu</button>
+      <div class="topo-titulo" id="topoTitulo"></div>
+      <label class="busca"><span class="sr">Buscar nos documentos</span><input id="busca" type="search" placeholder="Buscar nos documentos"></label>
+    </header>
+    <main id="conteudo" tabindex="-1"></main>
+  </div>
+</div>
+<script>/*{{MARKED}}*/</script>
+<script>/*{{MERMAID}}*/</script>
+<script type="application/json" id="dados">{{DADOS}}</script>
+<script>
+/*{{JS}}*/
+</script>
+</body>
+</html>

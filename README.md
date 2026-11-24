@@ -108,7 +108,7 @@ databricks jobs run-now --json @jobs/teste_a5_parametros.json -p ft03
 | Linux, macOS ou Git Bash | `bash run.sh` |
 | Windows PowerShell | `& "C:\Program Files\Git\bin\bash.exe" run.sh` (o `bash` do Windows pode ser o do WSL, que não tem a CLI nem o perfil) |
 
-Outro perfil: `PERFIL=outro bash run.sh`. Resultado esperado: JSON da execução com `"result_state": "SUCCESS"`, 7 tarefas `SUCCESS` e código de saída 0. Última execução conferida: 281 s (24/11/2026). A saída mostra o e-mail do workspace: não salve no repositório.
+Outro perfil: `PERFIL=outro bash run.sh`. Outro corpo do `run-now` (por exemplo com `job_parameters`): `bash run.sh jobs/teste_a5_parametros.json`. Resultado esperado: JSON da execução com `"result_state": "SUCCESS"`, 7 tarefas `SUCCESS` e código de saída 0. Se a execução não terminar em `SUCCESS`, o `run.sh` mostra `O job não terminou em SUCCESS.` e sai com 1, mesmo quando a CLI devolve 0 (OB-47). Última execução conferida: 281 s (24/11/2026). A saída mostra o e-mail do workspace: não salve no repositório.
 
 Atualizar `output/` depois de uma execução:
 ```bash
@@ -180,7 +180,7 @@ Os arquivos de controle que o Databricks grava junto (`_SUCCESS`, `_committed_*`
 - **Catálogo:** o nome `ft03_sismos_clima` está escrito nos SQL; o parâmetro `catalogo` só vale para os notebooks Python (DT-05).
 - **Regra Q-06:** usa magnitude mínima 5 fixa; rodar com outra `magnitude_minima` reprova a regra (DT-07).
 - **`gold.qualidade_regras`:** não guarda o horário de geração (DT-08).
-- **`run.sh`:** com o job em `SUCCESS` sai com código 0; o código de saída quando o job termina em FAILED é **A validar**.
+- **`run.sh`:** confere o `result_state` da execução, porque o `databricks` instalado pelo pip (0.18), que redireciona para a CLI nova, devolveu 0 numa falha (OB-47).
 - **Bibliotecas no serverless:** o `requests` usado no workspace é o do ambiente; a versão dele não foi conferida contra o `requirements.txt` (A validar).
 - **Free Edition:** uso pessoal, serverless, cotas não publicadas em número.
 - **Período testado:** só outubro de 2026.
@@ -190,4 +190,4 @@ Os arquivos de controle que o Databricks grava junto (`_SUCCESS`, `_committed_*`
 - Open-Meteo: CC BY 4.0, atribuição obrigatória; plano gratuito só para uso não comercial.
 
 ## 15. Documentação
-`docs/` tem requisitos com evidência (`01-negocio/requisitos.md`), estado do projeto, decisões, débito técnico e observações datadas de cada teste (`00-gestao/`), plano e arquitetura (`02-arquitetura/`) e fontes (`03-tecnico/`). Regra do projeto: nada inferido; o que não está em documentação oficial ou em teste real fica **A validar**.
+O portal do projeto (`portal/index.html`, abre offline) reúne os documentos, o progresso e a apresentação técnica; regerar com `python portal/gerar_portal.py`. `docs/` tem requisitos com evidência (`01-negocio/requisitos.md`), estado do projeto, decisões, débito técnico e observações datadas de cada teste (`00-gestao/`), plano e arquitetura (`02-arquitetura/`) e fontes (`03-tecnico/`). Regra do projeto: nada inferido; o que não está em documentação oficial ou em teste real fica **A validar**.

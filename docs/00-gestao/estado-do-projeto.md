@@ -12,14 +12,25 @@ Versão 0.2 · 24/11/2026
 | E6 Qualidade e relatório | Concluída | 15 regras aprovadas e `quality_report.json` gravado no volume `gold.export` (OB-29 a OB-33); teste negativo das 10 regras SQL (OB-31, OB-44) |
 | E7 Job e comando único | Concluída (24/11/2026) | Job `ft03-sismos-clima-pipeline` criado (OB-35), execução 1 com 6 tarefas `SUCCESS` (OB-36) A5 resolvida (OB-38) e DT-09 resolvido com outubro inteiro restaurado (execução 3, 15/15 regras, OB-39); `run.sh` executado com `SUCCESS` e código de saída 0 (DT-01, OB-40); commit 4de393e no GitHub |
 | E8 Exportação Parquet e README final | Concluída (24/11/2026) | `05_exportacao` gravou e provou o Parquet Snappy particionado no volume (OB-41); tarefa `exportacao` no job e execução 5 com 7 tarefas `SUCCESS` (OB-42); dataset e relatório copiados para `output/` (OB-43); teste negativo das 4 regras restantes (OB-44); requisitos revisados (OB-45); README completo; esboços removidos (DT-06); clone limpo com LF do `run.sh`, 34 testes no Windows e job `SUCCESS` (OB-46) |
+| E9 Portal e apresentação | Concluída (24/11/2026) | `portal/index.html` gerado dos documentos, com a aba de apresentação técnica (`docs/04-apresentacao/apresentacao-tecnica.md`); testado no Chromium (OB-48) |
 
 | Componente | Situação | Evidência |
 |---|---|---|
-| Estrutura do repositório | Criada | este repositório, 23/11/2026 |
-| Etapa 0 (4 células) | Executada no workspace | `notebooks/00_validacao_apis.py`, OB-06 a OB-09 |
-| Rede do Free Edition para as 2 APIs | Liberada | teste do responsável no workspace, 23/11/2026 |
+| Rede do Free Edition para as 2 APIs | Liberada | teste no workspace, 23/11/2026 (OB-01, OB-06 a OB-09) |
+| Catálogo, schemas, volumes e Git folder | Criados | OB-10 a OB-13 |
+| Extração resiliente (`config`, `http_client`, `extract`) | Implementado | 224 sismos e 224 climas, 226 chamadas (OB-15 a OB-19, OB-39) |
+| Bronze (`sql/bronze/01_bronze`) | Implementado | 1 resposta USGS e 224 respostas de clima (OB-21) |
+| Silver com desaninhamento SQL (`sql/silver/01_silver`) | Implementado | 224 sismos e 5.376 horas (OB-22 a OB-25) |
+| Gold com JOIN e métricas (`sql/gold/01_gold`) | Implementado | 5.376 linhas, partição ano/mês, Snappy (OB-27, OB-28) |
+| Qualidade (`sql/quality/02_regras`, `quality.py`, `04_qualidade`) | Implementado | 15/15 regras aprovadas, 10 regras SQL com teste negativo (OB-30 a OB-33, OB-44) |
+| Exportação (`notebooks/05_exportacao`) | Implementado | Parquet Snappy provado no rodapé (OB-41) |
+| Job com 7 tarefas e `run.sh` | Implementado | execução 931832972977407 `SUCCESS` em 281 s (OB-42) |
+| Testes unitários | Implementado | 34 passed no Linux e no Windows (OB-45, OB-46) |
+| `output/` (dataset e relatório) | Versionado | OB-43 |
+| README e clone limpo | Validado | OB-46 |
+| Portal do projeto (`portal/index.html`) | Gerado | 16 rotas e 14 diagramas sem erro (OB-48); regerar com `python portal/gerar_portal.py` |
 
 | # | Ação | Quem |
 |---|---|---|
-| 1 | Commit e push do registro do clone limpo (OB-46); Pull no Git folder para tirar os esboços do workspace | Ildean |
-| 2 | Abertos: DT-03 (licença), DT-04 e A7 (taxa da USGS), DT-05 (catálogo nos SQL), DT-07 (Q-06 fixa), DT-08 (`executado_em`), A9 (`endtime`), código de saída do `run.sh` com job FAILED, versão do `requests` no serverless, limpeza de `raw/_teste`, P-05 (aceite da 2ª entrega) e E9 portal (opcional) | Ildean e Claude |
+| 1 | Commit e push do portal e da correção do `run.sh` (falha e sucesso conferidos, OB-47); Pull no Git folder | Ildean |
+| 2 | Abertos: DT-03 (licença), DT-04 e A7 (taxa da USGS), DT-05 (catálogo nos SQL), DT-07 (Q-06 fixa), DT-08 (`executado_em`), A9 (`endtime`), versão do `requests` no serverless, limpeza de `raw/_teste`, P-05 (aceite da 2ª entrega) e E9 portal (opcional) | Ildean e Claude |

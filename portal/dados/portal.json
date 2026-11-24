@@ -1,0 +1,166 @@
+{
+  "titulo": "Sismos × Clima no Databricks",
+  "cliente": "Desafio Python FT03",
+  "fornecedor": "Ildean Freitas",
+  "subtitulo": "Portal do projeto · documentação, progresso e apresentação técnica",
+  "logo": "portal/dados/icone-projeto.svg",
+  "cores": {
+    "fundo": "#F3F5F8",
+    "superficie": "#FFFFFF",
+    "texto": "#1E2530",
+    "texto2": "#56606E",
+    "menu": "#13293D",
+    "destaque": "#1F5F8B",
+    "destaque_escuro": "#123A57",
+    "destaque_claro": "#5B9BC8",
+    "tinta": "#E3EEF6",
+    "tinta2": "#F3F8FB",
+    "borda": "#D3DAE3",
+    "borda_campo": "#A9B4C2",
+    "positivo": "#427751",
+    "negativo": "#D43416",
+    "alerta": "#FEBA02",
+    "info": "#5CACEB"
+  },
+  "fonte": "Arial, Helvetica, sans-serif",
+  "pastas_docs": [
+    "docs/00-gestao",
+    "docs/01-negocio",
+    "docs/02-arquitetura",
+    "docs/03-tecnico",
+    "docs/04-apresentacao"
+  ],
+  "rotulos_pastas": {
+    "docs/00-gestao": "Gestão",
+    "docs/01-negocio": "Negócio",
+    "docs/02-arquitetura": "Arquitetura",
+    "docs/03-tecnico": "Técnico",
+    "docs/04-apresentacao": "Apresentação"
+  },
+  "arquivos_raiz": [
+    "README.md",
+    "CHANGELOG.md",
+    "tests/README.md",
+    "output/README.md",
+    "config/README.md"
+  ],
+  "fontes": {
+    "termo": "docs/00-gestao/termo-de-abertura.md",
+    "estado": "docs/00-gestao/estado-do-projeto.md",
+    "regras": "docs/01-negocio/regras-de-negocio.md",
+    "requisitos": "docs/01-negocio/requisitos.md",
+    "debito": "docs/00-gestao/debito-tecnico.md",
+    "observacoes": "docs/00-gestao/observacoes-e-licoes.md",
+    "decisoes": "docs/00-gestao/decisoes-e-pendencias.md",
+    "arquitetura": "docs/02-arquitetura/arquitetura-da-solucao.md",
+    "diagramas": "docs/02-arquitetura/diagramas.md",
+    "changelog": "CHANGELOG.md"
+  },
+  "menu": [
+    {
+      "g": "Acompanhamento"
+    },
+    {
+      "id": "painel",
+      "t": "Painel"
+    },
+    {
+      "id": "progresso",
+      "t": "Progresso"
+    },
+    {
+      "id": "termo",
+      "t": "Termo de abertura"
+    },
+    {
+      "g": "Apresentação"
+    },
+    {
+      "id": "apresentacao",
+      "t": "Apresentação técnica",
+      "doc": "docs/04-apresentacao/apresentacao-tecnica.md",
+      "sub": "Roteiro passo a passo para a equipe técnica, com diagramas e números das execuções"
+    },
+    {
+      "g": "Negócio"
+    },
+    {
+      "id": "regras",
+      "t": "Regras de negócio"
+    },
+    {
+      "id": "requisitos",
+      "t": "Requisitos"
+    },
+    {
+      "id": "decisoes",
+      "t": "Decisões e pendências"
+    },
+    {
+      "g": "Solução"
+    },
+    {
+      "id": "arquitetura",
+      "t": "Arquitetura e processo"
+    },
+    {
+      "id": "plano",
+      "t": "Plano detalhado",
+      "doc": "docs/02-arquitetura/plano-detalhado.md",
+      "sub": "Tabelas, transformações, regras de qualidade e extração"
+    },
+    {
+      "id": "fontes",
+      "t": "Fontes de dados",
+      "doc": "docs/03-tecnico/fontes-de-dados.md",
+      "sub": "USGS e Open-Meteo: endpoints, limites e licenças"
+    },
+    {
+      "id": "readme",
+      "t": "README do repositório",
+      "doc": "README.md",
+      "sub": "Instalação, execução, testes, schema e limitações"
+    },
+    {
+      "t": "Repositório no GitHub",
+      "url": "https://github.com/ildeanmaster-dot/ft03-sismos-clima-databricks"
+    },
+    {
+      "g": "Gestão"
+    },
+    {
+      "id": "debito",
+      "t": "Débito técnico"
+    },
+    {
+      "id": "observacoes",
+      "t": "Observações e lições"
+    },
+    {
+      "id": "riscos",
+      "t": "Riscos",
+      "doc": "docs/00-gestao/riscos.md",
+      "sub": "Riscos e respostas"
+    },
+    {
+      "g": "Referência"
+    },
+    {
+      "id": "docs",
+      "t": "Todos os documentos"
+    },
+    {
+      "id": "historico",
+      "t": "Histórico de mudanças"
+    }
+  ],
+  "painel": {
+    "kpi_pendencias": "aceite da 2ª entrega pela turma (P-05)",
+    "mockup": {
+      "t": "Apresentação técnica",
+      "texto": "Roteiro em 13 partes com diagramas, números das execuções e comandos da demonstração ao vivo.",
+      "botao": "Abrir apresentação",
+      "url": "#apresentacao"
+    }
+  }
+}
