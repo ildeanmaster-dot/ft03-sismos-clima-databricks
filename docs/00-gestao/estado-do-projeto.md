@@ -12,7 +12,7 @@ Versão 0.2 · 24/11/2026
 | E6 Qualidade e relatório | Concluída | 15 regras aprovadas e `quality_report.json` gravado no volume `gold.export` (OB-29 a OB-33); teste negativo das 10 regras SQL (OB-31, OB-44) |
 | E7 Job e comando único | Concluída (24/11/2026) | Job `ft03-sismos-clima-pipeline` criado (OB-35), execução 1 com 6 tarefas `SUCCESS` (OB-36) A5 resolvida (OB-38) e DT-09 resolvido com outubro inteiro restaurado (execução 3, 15/15 regras, OB-39); `run.sh` executado com `SUCCESS` e código de saída 0 (DT-01, OB-40); commit 4de393e no GitHub |
 | E8 Exportação Parquet e README final | Concluída (24/11/2026) | `05_exportacao` gravou e provou o Parquet Snappy particionado no volume (OB-41); tarefa `exportacao` no job e execução 5 com 7 tarefas `SUCCESS` (OB-42); dataset e relatório copiados para `output/` (OB-43); teste negativo das 4 regras restantes (OB-44); requisitos revisados (OB-45); README completo; esboços removidos (DT-06); clone limpo com LF do `run.sh`, 34 testes no Windows e job `SUCCESS` (OB-46) |
-| E9 Portal e apresentação | Concluída (24/11/2026) | `portal/index.html` gerado dos documentos, com as abas Apresentação técnica, Roteiro de execução e Execução animada (`docs/04-apresentacao/`); testado no Chromium (OB-48, OB-49) |
+| E9 Portal e apresentação | Concluída (24/11/2026) | `portal/index.html` gerado dos documentos, com as abas Apresentação técnica, Roteiro de execução e Execução animada (`docs/04-apresentacao/`); testado no Chromium (OB-48, OB-49); notebook `notebooks/validacao_do_pipeline` validado no workspace (OB-50, OB-51) |
 
 | Componente | Situação | Evidência |
 |---|---|---|
