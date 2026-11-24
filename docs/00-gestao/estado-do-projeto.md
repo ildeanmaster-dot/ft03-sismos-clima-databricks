@@ -1,5 +1,5 @@
 # Estado do projeto
-Versão 0.1 · 23/11/2026
+Versão 0.2 · 24/11/2026
 
 | Etapa | Situação | O que falta |
 |---|---|---|
@@ -10,7 +10,7 @@ Versão 0.1 · 23/11/2026
 | E4 Bronze e silver (desaninhamento SQL) | Concluída | Bronze, `silver.sismos` (224) e `silver.clima_horario` (5.376 = 224 x 24) criadas e conferidas (OB-20 a OB-25); próxima: E5 gold |
 | E5 Gold (transformações e JOIN) | Concluída | `gold.sismo_clima_horario` com 5.376 linhas (224 x 24), T4 e T5, partição ano/mês e propriedade Snappy registrada (OB-27, OB-28); próxima: E6 qualidade |
 | E6 Qualidade e relatório | Concluída | 15 regras aprovadas e `quality_report.json` gravado no volume `gold.export` (OB-29 a OB-33); falta teste negativo de 4 regras (Q-05a, Q-05b, Q-09, Q-11); próxima: E7 job |
-| E7 Job e comando único | Em andamento (24/11/2026) | Job `ft03-sismos-clima-pipeline` criado (OB-35), execução 1 com 6 tarefas `SUCCESS` (OB-36) e A5 resolvida (OB-38); falta corrigir o reprocessamento do `raw` (DT-09), restaurar outubro inteiro, criar o `run.sh` (DT-01) e a tarefa de exportação (E8) |
+| E7 Job e comando único | Em andamento (24/11/2026) | Job `ft03-sismos-clima-pipeline` criado (OB-35), execução 1 com 6 tarefas `SUCCESS` (OB-36) A5 resolvida (OB-38) e DT-09 resolvido com outubro inteiro restaurado (execução 3, 15/15 regras, OB-39); `run.sh` executado com `SUCCESS` e código de saída 0 (DT-01, OB-40); falta a tarefa de exportação (E8) |
 | E8 Exportação Parquet e README final | Pendente | E7 |
 
 | Componente | Situação | Evidência |
@@ -21,6 +21,5 @@ Versão 0.1 · 23/11/2026
 
 | # | Ação | Quem |
 |---|---|---|
-| 1 | Rodar a Etapa 0 e colar a saída | Ildean |
-| 2 | Responder as pendências P-01 a P-05 | Ildean |
-| 3 | Apresentar o plano detalhado | Claude |
+| 1 | Fazer o commit e o push de `run.sh`, `jobs/run_padrao.json`, README, CHANGELOG e documentos | Ildean |
+| 2 | E8: `05_exportacao`, `output/`, testes negativos Q-05a, Q-05b, Q-09, Q-11, README, clone limpo | Claude e Ildean |

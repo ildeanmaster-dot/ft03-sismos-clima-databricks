@@ -39,7 +39,16 @@ Catálogo Unity Catalog: `ft03_sismos_clima` (schemas `bronze`, `silver`, `gold`
 | `config/` | Parâmetros não secretos |
 
 ## Como executar
-**A validar** — definido no plano. Previsto: um job do Databricks que encadeia os notebooks, disparado por um comando (`run.sh`).
+Comando único: `run.sh` dispara o job `ft03-sismos-clima-pipeline` (6 tarefas: extração, bronze, silver, gold, regras, relatório) e espera o fim.
+
+Pré-requisitos: Databricks CLI 0.218 ou mais nova, perfil autenticado (`databricks auth login --host <url do workspace> --profile ft03`) e o job criado no workspace (`jobs/ft03_pipeline.json`).
+
+| Sistema | Comando |
+|---|---|
+| Linux, macOS ou Git Bash | `bash run.sh` |
+| Windows PowerShell | `& "C:\Program Files\Git\bin\bash.exe" run.sh` (o `bash` do Windows pode ser o do WSL, que não tem a CLI nem o perfil) |
+
+Outro perfil: `PERFIL=outro bash run.sh`. Resultado esperado: JSON da execução com `"result_state": "SUCCESS"` e código de saída 0. Relatório de qualidade em `/Volumes/ft03_sismos_clima/gold/export/reports/quality_report.json`.
 
 ## Variáveis de ambiente
 Ver `.env.example`. As duas APIs não usam chave. Nenhum segredo é versionado.

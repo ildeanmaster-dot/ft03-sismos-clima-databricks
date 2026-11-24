@@ -16,5 +16,5 @@ Versão 0.1 · 23/11/2026
 | RNF-01 | Repositório público com código em `src/` | Alta | Parcial | Estrutura criada |
 | RNF-02 | README com execução, variáveis e APIs | Alta | Parcial | `README.md` |
 | RNF-03 | requirements.txt com versões exatas | Alta | Parcial | `requirements.txt` |
-| RNF-04 | run.sh ou comando único | Alta | Esqueleto | `run.sh` (P-04) |
+| RNF-04 | run.sh ou comando único | Alta | Atendido (24/11/2026) | `run.sh` dispara o job e espera o fim; execução 357476527649763 com `SUCCESS` (OB-40) |
 | RNF-05 | Dataset final em `output/` (.parquet) | Alta | Pendente | P-02 |

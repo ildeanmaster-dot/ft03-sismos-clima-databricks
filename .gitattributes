@@ -1,0 +1,2 @@
+# run.sh precisa de LF para o bash; eol=lf mantém LF no checkout (git-scm.com/docs/gitattributes)
+*.sh text eol=lf
