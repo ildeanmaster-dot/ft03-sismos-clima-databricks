@@ -168,7 +168,7 @@ flowchart TB
 | Compressão no rodapé | `SNAPPY` em todas as colunas (lido com `pyarrow`) |
 | Formato Parquet | 1.0, gravado pelo Photon |
 
-Ponto para a equipe: o nome `.snappy.parquet` e a propriedade da tabela não provam a compressão; o rodapé do arquivo prova.
+Observação: o nome `.snappy.parquet` e a propriedade da tabela não provam a compressão; o rodapé do arquivo prova.
 
 ## 9. Orquestração
 Job `ft03-sismos-clima-pipeline`, 7 tarefas em sequência, sem cluster configurado (serverless). Comando único: `run.sh` (`databricks jobs run-now`, espera o fim).

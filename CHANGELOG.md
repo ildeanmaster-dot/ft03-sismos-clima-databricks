@@ -15,7 +15,7 @@
 - `run.sh` confere o `result_state` e sai com 1 se o job não terminar em `SUCCESS`; aceita o corpo do `run-now` como argumento (OB-47).
 - Portal do projeto (`portal/`) com a aba Apresentação técnica; regras, decisões, arquitetura e diagramas atualizados para o que foi construído (OB-48).
 - Portal: abas Roteiro de execução (comandos da apresentação) e Execução animada (play etapa por etapa, cenários de sucesso e de falha) (OB-49).
-- Notebook `notebooks/validacao_do_pipeline` (validação do pipeline e roteiro da apresentação): a apresentação inteira dentro do Databricks, com texto e consultas só de leitura; job disparado pela interface com sucesso (OB-50).
+- Notebook `notebooks/validacao_do_pipeline` (validação do pipeline): confere cada camada dentro do Databricks, com descrição técnica e consultas só de leitura; job disparado pela interface com sucesso (OB-50).
 
 ## 0.1.0 — 23/11/2026
 - Estrutura inicial do repositório, documentação base (gestão, negócio, arquitetura, fontes) e célula da Etapa 0 (`notebooks/00_validacao_apis.py`).

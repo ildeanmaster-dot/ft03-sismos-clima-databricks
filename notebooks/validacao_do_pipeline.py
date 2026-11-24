@@ -6,22 +6,22 @@
 # DBTITLE 1,Validação do pipeline
 # MAGIC %md
 # MAGIC # Validação do pipeline Sismos × Clima
-# MAGIC Confere, camada por camada, o resultado da última execução do job e serve de roteiro da apresentação técnica. **Todas as células só leem**: nenhuma chama API, grava tabela ou regrava arquivo. Pode usar **Run all**.
+# MAGIC Confere, camada por camada, o resultado da última execução do job `ft03-sismos-clima-pipeline`. Todas as células são somente leitura: nenhuma chama API, grava tabela ou regrava arquivo.
 # MAGIC
-# MAGIC **Antes de começar**
-# MAGIC 1. Compute deste notebook: **Serverless** (ele mistura SQL e Python; SQL warehouse não roda Python).
-# MAGIC 2. Dispare o pipeline em **Jobs & Pipelines → ft03-sismos-clima-pipeline → Run now** (cerca de 5 minutos). As consultas leem o resultado da última execução.
+# MAGIC **Requisitos**
+# MAGIC - Compute **Serverless** (o notebook tem células SQL e Python).
+# MAGIC - Uma execução do job concluída (Jobs & Pipelines → `ft03-sismos-clima-pipeline` → Run now).
 # MAGIC
-# MAGIC | Parte | Assunto |
+# MAGIC | Seção | O que valida |
 # MAGIC |---|---|
-# MAGIC | 1 | Abertura |
-# MAGIC | 2 | Arquitetura: o que existe em cada camada |
-# MAGIC | 3 | Extração resiliente |
-# MAGIC | 4 | Bronze e silver: desaninhamento em SQL |
-# MAGIC | 5 | Gold: JOIN e métricas |
-# MAGIC | 6 | Qualidade e teste negativo |
-# MAGIC | 7 | Exportação e prova do Snappy |
-# MAGIC | 8 | Resultado do job e falha controlada |
+# MAGIC | 1 | Escopo e números esperados |
+# MAGIC | 2 | Objetos de cada camada do medalhão |
+# MAGIC | 3 | Relatório da extração |
+# MAGIC | 4 | Desaninhamento em SQL (bronze → silver) |
+# MAGIC | 5 | JOIN, métricas e propriedades da gold |
+# MAGIC | 6 | Regras de qualidade e teste negativo |
+# MAGIC | 7 | Parquet exportado e compressão no rodapé |
+# MAGIC | 8 | Execução do job e falha controlada |
 
 # COMMAND ----------
 
@@ -31,24 +31,31 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 1 · Abertura
+# DBTITLE 1,1 · Escopo
 # MAGIC %md
-# MAGIC ## Parte 1 · Abertura
-# MAGIC **Falar:**
-# MAGIC - Pergunta: como estava o clima no epicentro, hora a hora, no dia de cada terremoto de magnitude 5 ou mais?
-# MAGIC - Duas APIs públicas de domínios diferentes: **USGS** (sismologia) e **Open-Meteo** (meteorologia).
-# MAGIC - Outubro de 2026: **224 sismos x 24 horas = 5.376 linhas**.
-# MAGIC - Databricks Free Edition, serverless, Python e SQL, job de 7 tarefas.
+# MAGIC ## 1 · Escopo
+# MAGIC - Pergunta: clima horário no epicentro, no dia UTC de cada sismo de magnitude 5 ou mais.
+# MAGIC - Fontes: USGS Earthquake Catalog (sismologia) e Open-Meteo Historical (meteorologia).
+# MAGIC - Período padrão: 01 a 31/10/2026. Valores esperados nessa janela: 224 sismos, 5.376 linhas na gold (224 x 24).
+# MAGIC - Execução: Databricks Free Edition, serverless, job de 7 tarefas.
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 2 · Arquitetura
+# DBTITLE 1,2 · Camadas do medalhão
 # MAGIC %md
-# MAGIC ## Parte 2 · Arquitetura: o que existe em cada camada
-# MAGIC **Falar:** medalhão no Unity Catalog, um catálogo do projeto e um schema por camada.
-# MAGIC - **bronze:** volume `raw` (JSON como a API devolveu: `usgs/` com 1 arquivo, `open_meteo/` com 1 arquivo por sismo e `extracao_relatorio.json`); `usgs_resposta` (1 linha com a lista `features` de 224 sismos); `meteo_resposta` (1 linha por sismo, com listas paralelas em `hourly`).
-# MAGIC - **silver:** `sismos` (1 linha por sismo, 12 colunas) e `clima_horario` (1 linha por sismo e hora, 10 colunas).
-# MAGIC - **gold:** `sismo_clima_horario` (22 colunas, partição ano/mês, Snappy), `qualidade_regras` (1 linha por regra SQL) e volume `export` (Parquet e relatório).
+# MAGIC ## 2 · Camadas do medalhão
+# MAGIC Catálogo `ft03_sismos_clima`, um schema por camada.
+# MAGIC
+# MAGIC | Camada | Objeto | Conteúdo |
+# MAGIC |---|---|---|
+# MAGIC | bronze | volume `raw` | JSON como a API devolveu: `usgs/` (1 arquivo por período), `open_meteo/` (1 arquivo por sismo, nome = `evento_id`), `extracao_relatorio.json` |
+# MAGIC | bronze | `usgs_resposta` | 1 linha por arquivo da USGS; `features` = lista dos sismos |
+# MAGIC | bronze | `meteo_resposta` | 1 linha por sismo; `hourly` = listas paralelas por variável |
+# MAGIC | silver | `sismos` | 1 linha por sismo, 12 colunas |
+# MAGIC | silver | `clima_horario` | 1 linha por sismo e hora, 10 colunas |
+# MAGIC | gold | `sismo_clima_horario` | 22 colunas, `PARTITIONED BY (ano, mes)`, Snappy |
+# MAGIC | gold | `qualidade_regras` | 1 linha por regra SQL |
+# MAGIC | gold | volume `export` | `dataset/` (Parquet) e `reports/quality_report.json` |
 
 # COMMAND ----------
 
@@ -69,17 +76,16 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 3 · Extração resiliente
+# DBTITLE 1,3 · Extração
 # MAGIC %md
-# MAGIC ## Parte 3 · Extração resiliente
-# MAGIC Código: `notebooks/01_extracao_bronze` e `src/sismos_clima/http_client.py` (mostrar sem executar).
+# MAGIC ## 3 · Extração
+# MAGIC Código: `notebooks/01_extracao_bronze`, `src/sismos_clima/extract.py` e `src/sismos_clima/http_client.py`.
+# MAGIC - `count` antes da `query` (a USGS aceita até 20.000 eventos por consulta); 1 chamada ao Open-Meteo por sismo.
+# MAGIC - Controle de taxa (`LimitadorTaxa`): 1 s entre chamadas à USGS e 0,5 s ao Open-Meteo.
+# MAGIC - Retentativa (`ClienteHttp`): 429, 500, 502, 503, 504 e timeout; até 5 vezes, espera 1, 2, 4, 8 s com variação; respeita `Retry-After`; 4xx não repete.
+# MAGIC - `limpar_raw` apaga os JSON da execução anterior depois que a USGS responde.
 # MAGIC
-# MAGIC **Falar:**
-# MAGIC - `count` antes da `query`: a USGS aceita até 20.000 eventos por consulta.
-# MAGIC - 1 `count` + 1 `query` + 1 chamada de clima por sismo = **226 chamadas**.
-# MAGIC - **Controle de taxa** (`LimitadorTaxa`): 1 s entre chamadas à USGS (limite não publicado) e 0,5 s ao Open-Meteo (publica 600 por minuto).
-# MAGIC - **Retentativa** (`ClienteHttp`): só 429, 500, 502, 503, 504 e timeout; até 5 vezes, espera 1, 2, 4, 8 s com variação; respeita `Retry-After`. 400 não repete.
-# MAGIC - `limpar_raw` apaga os JSON da execução anterior **depois** que a USGS responde: sem isso a bronze misturava períodos (erro real, corrigido).
+# MAGIC Esperado: `count_usgs` = `climas_gravados`, `chamadas` = `count_usgs` + 2, `falhas` vazio, `completo` true.
 
 # COMMAND ----------
 
@@ -93,15 +99,15 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 4 · Bronze e silver
+# DBTITLE 1,4 · Desaninhamento em SQL
 # MAGIC %md
-# MAGIC ## Parte 4 · Bronze e silver: desaninhamento em SQL
-# MAGIC Código: `sql/silver/01_silver` (mostrar `explode(features)` e `LATERAL VIEW posexplode(hourly.time)`).
+# MAGIC ## 4 · Desaninhamento em SQL
+# MAGIC Código: `sql/silver/01_silver`.
+# MAGIC - USGS: `explode(features)` transforma a lista de sismos em linhas.
+# MAGIC - Open-Meteo: `LATERAL VIEW posexplode(hourly.time)` cria uma linha por hora e a posição lê as outras listas com `try_element_at`.
+# MAGIC - Transformações na silver: T1 tipos e datas, T2 nulos (linha sem chave, instante, magnitude ou coordenada é rejeitada; clima nulo continua nulo), T3 deduplicação (versão mais recente).
 # MAGIC
-# MAGIC **Falar:**
-# MAGIC - A USGS é **uma linha só** com 224 sismos numa lista; `explode` vira 224 linhas.
-# MAGIC - O Open-Meteo manda **listas paralelas** (horas, temperatura, umidade...); `posexplode` cria uma linha por hora e guarda a posição para ler as outras listas.
-# MAGIC - Silver: **T1** tipos e datas, **T2** nulos (linha sem chave, horário, magnitude ou coordenada é rejeitada), **T3** deduplicação (versão mais recente).
+# MAGIC Esperado: 1 linha na bronze com 224 sismos na lista e 224 linhas na silver; as listas do sismo `us6000tyny` na bronze aparecem como linhas na silver, com os mesmos valores.
 
 # COMMAND ----------
 
@@ -135,15 +141,15 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 5 · Gold
+# DBTITLE 1,5 · Gold
 # MAGIC %md
-# MAGIC ## Parte 5 · Gold: JOIN e métricas
-# MAGIC Código: `sql/gold/01_gold` (mostrar o `INNER JOIN ... ON evento_id`, o `PARTITIONED BY (ano, mes)` e o `TBLPROPERTIES`).
+# MAGIC ## 5 · Gold
+# MAGIC Código: `sql/gold/01_gold`.
+# MAGIC - T4: JOIN de `silver.sismos` com `silver.clima_horario` por `evento_id` (o Open-Meteo ajusta a coordenada à grade, então ela não serve de chave).
+# MAGIC - T5: `horas_desde_sismo`, `periodo`, `faixa_magnitude`, média, amplitude e chuva do dia.
+# MAGIC - Tabela gerenciada com `delta.parquet.compression.codec = SNAPPY` (o padrão do Unity Catalog é ZSTD).
 # MAGIC
-# MAGIC **Falar:**
-# MAGIC - JOIN pelo **id do sismo**, não pela coordenada: o Open-Meteo ajusta o ponto à grade (mandei 36,1078, voltou 36,098415).
-# MAGIC - Métricas: `horas_desde_sismo`, `periodo` (antes, hora do sismo, depois), `faixa_magnitude`, média, amplitude e chuva do dia.
-# MAGIC - A tabela gerenciada nasce com ZSTD; o Snappy foi declarado na tabela. A prova no arquivo vem na Parte 7.
+# MAGIC Esperado: linhas da gold = sismos x 24 = pares únicos (`evento_id`, `hora_utc`); `horas_desde_sismo` -1, 0 e 1 com `periodo` antes, hora do sismo e depois.
 
 # COMMAND ----------
 
@@ -174,16 +180,16 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 6 · Qualidade
+# DBTITLE 1,6 · Qualidade
 # MAGIC %md
-# MAGIC ## Parte 6 · Qualidade e teste negativo
-# MAGIC Código: `sql/quality/02_regras` e `src/sismos_clima/quality.py`.
+# MAGIC ## 6 · Qualidade
+# MAGIC Código: `sql/quality/02_regras`, `notebooks/04_qualidade` e `src/sismos_clima/quality.py`.
+# MAGIC - 15 regras: 10 em SQL e 5 em Python (Q-01a, Q-01b, Q-01c schema; Q-03 taxa de nulos; Q-10 silver igual ao `count` da USGS).
+# MAGIC - Q-03 tem nível aviso; as demais, nível erro.
+# MAGIC - Política de falha: o relatório é gravado antes da decisão; regra de erro reprovada faz a tarefa `relatorio` falhar e a `exportacao` não roda.
+# MAGIC - Teste negativo: a mesma expressão de cada regra SQL aplicada a dados inventados com defeito.
 # MAGIC
-# MAGIC **Falar:**
-# MAGIC - 15 regras: 10 em SQL e 5 em Python (schema das 3 tabelas, taxa de nulos do clima, silver igual ao `count` da USGS).
-# MAGIC - Só a Q-03 é aviso; as outras são erro e bloqueiam a publicação.
-# MAGIC - O relatório é gravado **antes** da decisão: se uma regra de erro reprovar, a tarefa falha, o Parquet não é publicado e o relatório explica o motivo.
-# MAGIC - Zero violações não prova que a regra funciona: o **teste negativo** aplica a mesma conta a dados inventados com defeito.
+# MAGIC Esperado: 15 regras aprovadas, `aprovado` true e `detectou` em todas as linhas dos testes negativos.
 
 # COMMAND ----------
 
@@ -271,15 +277,14 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 7 · Exportação
+# DBTITLE 1,7 · Exportação
 # MAGIC %md
-# MAGIC ## Parte 7 · Exportação e prova do Snappy
+# MAGIC ## 7 · Exportação
 # MAGIC Código: `notebooks/05_exportacao` (`write.mode("overwrite").partitionBy("ano", "mes").option("compression", "snappy").parquet(...)`).
+# MAGIC - Destino: volume `gold.export/dataset`, uma pasta por ano e mês; os arquivos iniciados por `_` são o controle de transação do Databricks.
+# MAGIC - A compressão é conferida no rodapé do arquivo Parquet, coluna por coluna (o nome `.snappy.parquet` não é prova).
 # MAGIC
-# MAGIC **Falar:**
-# MAGIC - Parquet particionado por ano e mês no volume `gold.export`; os arquivos que começam com `_` são o controle de transação do Databricks.
-# MAGIC - O Parquet tem as mesmas 5.376 linhas da gold; dentro do arquivo são 20 colunas, porque `ano` e `mes` ficam no nome das pastas.
-# MAGIC - O nome `.snappy.parquet` não prova nada: a prova é o rodapé do arquivo, onde o Parquet registra a compressão de cada coluna.
+# MAGIC Esperado: mesmas linhas da gold, 1 arquivo por partição, 20 colunas no arquivo (`ano` e `mes` ficam no caminho) e `{'SNAPPY'}` no rodapé.
 
 # COMMAND ----------
 
@@ -312,14 +317,14 @@ print("compressões no rodapé:", codecs)  # esperado {'SNAPPY'}
 
 # COMMAND ----------
 
-# DBTITLE 1,Parte 8 · Resultado e falha controlada
+# DBTITLE 1,8 · Execução do job e falha controlada
 # MAGIC %md
-# MAGIC ## Parte 8 · Resultado do job e falha controlada
-# MAGIC **Mostrar:** Jobs & Pipelines → ft03-sismos-clima-pipeline → execução de hoje.
-# MAGIC - Aba **List**: as 7 tarefas `Succeeded`, a duração de cada uma e a coluna **Depends on** (a cadeia extracao → ... → exportacao).
-# MAGIC - Aba **Timeline**: a extração ocupa cerca de metade do tempo, por causa do intervalo entre chamadas.
-# MAGIC - Painel **Parameters** da tarefa: os valores recebidos, com a marca `(resolved)`.
+# MAGIC ## 8 · Execução do job e falha controlada
+# MAGIC **Execução:** Jobs & Pipelines → `ft03-sismos-clima-pipeline` → última execução.
+# MAGIC - Aba List: 7 tarefas `Succeeded`, duração e dependências (extracao → bronze → silver → gold → regras → relatorio → exportacao).
+# MAGIC - Aba Timeline: tempo de cada tarefa.
+# MAGIC - Painel Parameters da tarefa: valores recebidos, marcados como `(resolved)`.
 # MAGIC
-# MAGIC **Falha controlada (opcional, cerca de 2 minutos):** seta ao lado de **Run now** → **Run now with different parameters** → `data_inicio` = `2026-10-31` e `data_fim` = `2026-10-01` → Run.
-# MAGIC - A tarefa `extracao` falha no primeiro passo (período invertido), antes de chamar as APIs; as outras 6 não rodam. Nada é alterado.
-# MAGIC - **Falar:** o pipeline para cedo e com mensagem clara; pelo terminal, o `run.sh` devolve código 1 nesse caso.
+# MAGIC **Falha controlada:** Run now with different parameters com `data_inicio` = `2026-10-31` e `data_fim` = `2026-10-01`.
+# MAGIC - A tarefa `extracao` falha ao validar o período, antes de chamar as APIs; as demais não rodam e nenhum dado é alterado.
+# MAGIC - Pelo terminal, `run.sh` devolve código 1 nesse caso.

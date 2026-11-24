@@ -13,7 +13,7 @@ Testado em 24/11/2026 (OB-50). Tudo fica no workspace:
 |---|---|---|---|
 | W1 | Workspace → Home → Drafts → `ft03-sismos-clima-databricks` → botão `main` → **Pull** | Deixa o Git folder igual ao GitHub | Pull sem conflito |
 | W2 | **Jobs & Pipelines** → `ft03-sismos-clima-pipeline` → **Run now** | Dispara o pipeline (cerca de 4 min 35 s) | Execução nova, lançamento `Manually`, 7 tarefas `Succeeded` |
-| W3 | Git folder → `notebooks/validacao_do_pipeline`, compute **Serverless**, **Run all** | Notebook da apresentação: texto do que falar e consultas de cada parte, todas só de leitura | Mesmos números das OB-50 (224, 5.376, 15/15, SNAPPY) |
+| W3 | Git folder → `notebooks/validacao_do_pipeline`, compute **Serverless**, **Run all** | Notebook de validação: descrição de cada camada e consultas que conferem o resultado, todas só de leitura | Mesmos números das OB-50 (224, 5.376, 15/15, SNAPPY) |
 | W4 | Página da execução: abas **List**, **Graph** e **Timeline**; painel **Parameters** | Mostra o resultado e o tempo de cada tarefa | 7 tarefas `Succeeded` |
 | W5 | Opcional: seta ao lado de Run now → **Run now with different parameters** → `data_inicio` 2026-10-31, `data_fim` 2026-10-01 | Falha controlada, sem alterar dados | `extracao` falha, as outras 6 não rodam |
 
@@ -55,7 +55,7 @@ Mostra que o comando único avisa quando o job falha. É segura: a tarefa `extra
 | F1 | `& "C:\Program Files\Git\bin\bash.exe" run.sh jobs/teste_falha_parametros.json` | Dispara o job com início 31/10 e fim 01/10 | `Error: failed to reach TERMINATED or SKIPPED ... Task extracao failed ...` e `O job não terminou em SUCCESS.` |
 | F2 | `$LASTEXITCODE` | Código de saída da falha | `1` |
 
-Ponto para explicar: o `databricks` do PATH (0.18 do pip) devolvia 0 numa falha; o `run.sh` confere o `result_state` e sai com 1 (OB-47).
+Motivo: o `databricks` do PATH (0.18 do pip) devolvia 0 numa falha; o `run.sh` confere o `result_state` e sai com 1 (OB-47).
 
 ## 4. Se algo der errado
 | Sintoma | O que fazer |
