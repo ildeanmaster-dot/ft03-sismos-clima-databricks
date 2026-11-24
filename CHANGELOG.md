@@ -14,6 +14,7 @@
 - Clone limpo validado: LF do `run.sh`, 34 testes no Windows e comando único com `SUCCESS` (OB-46). E8 concluída.
 - `run.sh` confere o `result_state` e sai com 1 se o job não terminar em `SUCCESS`; aceita o corpo do `run-now` como argumento (OB-47).
 - Portal do projeto (`portal/`) com a aba Apresentação técnica; regras, decisões, arquitetura e diagramas atualizados para o que foi construído (OB-48).
+- Portal: abas Roteiro de execução (comandos da apresentação) e Execução animada (play etapa por etapa, cenários de sucesso e de falha) (OB-49).
 
 ## 0.1.0 — 23/11/2026
 - Estrutura inicial do repositório, documentação base (gestão, negócio, arquitetura, fontes) e célula da Etapa 0 (`notebooks/00_validacao_apis.py`).

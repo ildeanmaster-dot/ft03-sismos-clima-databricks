@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execução animada · Sismos × Clima no Databricks</title>
+<style>
+  :root {
+    --fundo: #F3F5F8; --sup: #FFFFFF; --texto: #1E2530; --texto2: #56606E; --borda: #D3DAE3;
+    --azul: #1F5F8B; --azul-esc: #123A57; --azul-cla: #E3EEF6; --verde: #427751; --verde-cla: #E8F3EA;
+    --vermelho: #D43416; --vermelho-cla: #FBE9E6; --cinza: #A9B4C2; --amarelo: #FEBA02;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--texto); background: var(--fundo); }
+  .pagina { max-width: 1180px; margin: 0 auto; padding: 20px 20px 40px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--texto2); font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
+  .cartao { background: var(--sup); border: 1px solid var(--borda); border-radius: 10px; padding: 16px; }
+  .controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  button, select { font: inherit; font-size: 14px; border-radius: 8px; border: 1px solid var(--borda); background: var(--sup); color: var(--texto); padding: 8px 12px; cursor: pointer; }
+  button:hover { border-color: var(--azul); }
+  button:focus-visible, select:focus-visible { outline: 3px solid var(--azul-cla); outline-offset: 1px; border-color: var(--azul); }
+  button.primario { background: var(--azul); color: #fff; border-color: var(--azul); font-weight: bold; min-width: 110px; }
+  button.primario:hover { background: var(--azul-esc); }
+  .seg { display: inline-flex; border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; }
+  .seg button[aria-pressed="true"] { background: var(--azul-cla); color: var(--azul-esc); font-weight: bold; }
+  .seg button.falha[aria-pressed="true"] { background: var(--vermelho-cla); color: var(--vermelho); }
+  .espaco { flex: 1; }
+  .relogio { font-variant-numeric: tabular-nums; color: var(--texto2); font-size: 13px; }
+  .relogio b { color: var(--texto); font-size: 15px; }
+  /* trilha das etapas */
+  .trilha { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin-bottom: 8px; }
+  .no { position: relative; border: 2px solid var(--borda); border-radius: 10px; background: var(--sup); padding: 10px 6px; text-align: center; min-height: 74px; cursor: pointer; transition: border-color .3s, background .3s, transform .3s; }
+  .no .num { font-size: 11px; color: var(--texto2); }
+  .no .nome { font-size: 13px; font-weight: bold; margin-top: 2px; word-break: break-word; }
+  .no .seg-real { font-size: 11px; color: var(--texto2); margin-top: 3px; }
+  .no .marca { position: absolute; top: -9px; right: -7px; width: 22px; height: 22px; border-radius: 50%; font-size: 13px; line-height: 22px; color: #fff; display: none; }
+  .no.ativo { border-color: var(--azul); background: var(--azul-cla); transform: translateY(-3px); animation: pulso 1.4s infinite; }
+  .no.feito { border-color: var(--verde); }
+  .no.feito .marca { display: block; background: var(--verde); }
+  .no.falhou { border-color: var(--vermelho); background: var(--vermelho-cla); }
+  .no.falhou .marca { display: block; background: var(--vermelho); }
+  .no.pulado { border-style: dashed; color: var(--cinza); background: #FAFBFC; }
+  .no.pulado .nome, .no.pulado .num, .no.pulado .seg-real { color: var(--cinza); }
+  @keyframes pulso { 0%,100% { box-shadow: 0 0 0 0 rgba(31,95,139,.35); } 50% { box-shadow: 0 0 0 7px rgba(31,95,139,0); } }
+  .barra { height: 8px; background: #E6EBF1; border-radius: 4px; overflow: hidden; margin: 6px 0 18px; }
+  .barra > span { display: block; height: 100%; width: 0; background: var(--azul); transition: width .2s linear; }
+  .barra.falha > span { background: var(--vermelho); }
+  /* painel da etapa */
+  .painel { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
+  .painel h2 { font-size: 18px; margin: 0 0 2px; }
+  .arquivo { font-family: Consolas, "Courier New", monospace; font-size: 12.5px; color: var(--azul-esc); background: var(--azul-cla); border-radius: 6px; padding: 3px 7px; display: inline-block; margin: 4px 0 10px; }
+  .rotulo { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto2); margin: 10px 0 6px; }
+  ol.passos { margin: 0; padding-left: 20px; }
+  ol.passos li { margin: 0 0 8px; line-height: 1.45; font-size: 14px; opacity: .25; transition: opacity .4s; }
+  ol.passos li.visivel { opacity: 1; }
+  ol.passos li.atual { font-weight: bold; }
+  .porque { margin-top: 12px; font-size: 13px; color: var(--texto2); border-left: 3px solid var(--azul); padding: 4px 10px; background: var(--fundo); border-radius: 0 6px 6px 0; }
+  .metricas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .metrica { border: 1px solid var(--borda); border-radius: 8px; padding: 10px; }
+  .metrica .v { font-size: 26px; font-weight: bold; font-variant-numeric: tabular-nums; }
+  .metrica .r { font-size: 12px; color: var(--texto2); margin-top: 2px; }
+  .metrica.ruim { border-color: var(--vermelho); background: var(--vermelho-cla); }
+  .metrica.ruim .v { color: var(--vermelho); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-family: Consolas, "Courier New", monospace; font-size: 12px; border: 1px solid var(--borda); border-radius: 14px; padding: 4px 9px; background: var(--sup); opacity: 0; transform: translateY(4px); transition: opacity .35s, transform .35s; }
+  .chip.visivel { opacity: 1; transform: none; }
+  .chip.ok { border-color: var(--verde); background: var(--verde-cla); }
+  .chip.erro { border-color: var(--vermelho); background: var(--vermelho-cla); }
+  /* terminal */
+  .terminal { margin-top: 14px; background: #10161F; color: #D7E1EC; border-radius: 10px; padding: 12px 14px; font-family: Consolas, "Courier New", monospace; font-size: 12.5px; height: 190px; overflow-y: auto; line-height: 1.55; }
+  .terminal .t { color: #7C8DA3; }
+  .terminal .ok { color: #8BD39C; }
+  .terminal .erro { color: #FF8A73; }
+  .terminal .cmd { color: #9CC9F0; }
+  .nota { font-size: 12px; color: var(--texto2); margin-top: 10px; line-height: 1.5; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  @media (max-width: 900px) {
+    .trilha { grid-template-columns: repeat(3, 1fr); }
+    .painel { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .no.ativo { animation: none; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <h1>Execução animada do pipeline</h1>
+  <p class="sub">Simulação didática do job <b>ft03-sismos-clima-pipeline</b>, etapa por etapa. Não roda o job de verdade: os números e tempos são das execuções registradas em 24/11/2026 (sucesso: execução 931832972977407, OB-42; falha: teste A5, execução 240375634623087, OB-37 e OB-38).</p>
+
+  <div class="cartao">
+    <div class="controles" role="toolbar" aria-label="Controles da animação">
+      <button class="primario" id="btPlay" aria-label="Reproduzir">▶ Play</button>
+      <button id="btAnt" aria-label="Etapa anterior">⏮ Anterior</button>
+      <button id="btProx" aria-label="Próxima etapa">Próxima ⏭</button>
+      <button id="btReini" aria-label="Reiniciar">↺ Reiniciar</button>
+      <label>Velocidade <select id="selVel"><option value="0.5">0,5x</option><option value="1" selected>1x</option><option value="2">2x</option></select></label>
+      <div class="seg" role="group" aria-label="Cenário">
+        <button id="cenOk" aria-pressed="true">Cenário: sucesso</button>
+        <button id="cenFalha" class="falha" aria-pressed="false">Cenário: falha na qualidade</button>
+      </div>
+      <span class="espaco"></span>
+      <span class="relogio">tempo real equivalente <b id="relogio">00:00</b> / <span id="total">04:37 (soma das 7 tarefas)</span></span>
+    </div>
+
+    <div class="trilha" id="trilha"></div>
+    <div class="barra" id="barra"><span></span></div>
+
+    <div class="painel">
+      <div>
+        <h2 id="titulo"></h2>
+        <span class="arquivo" id="arquivo"></span>
+        <div class="rotulo">O que acontece</div>
+        <ol class="passos" id="passos" aria-live="polite"></ol>
+        <div class="porque" id="porque"></div>
+      </div>
+      <div>
+        <div class="rotulo">Números da etapa</div>
+        <div class="metricas" id="metricas"></div>
+        <div class="rotulo">O que fica gravado</div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <div class="terminal" id="terminal" role="log" aria-label="Saída simulada"></div>
+    <p class="nota">Atalhos: espaço = play ou pausa; setas = etapa anterior ou próxima. Clique numa etapa da trilha para ir direto a ela.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Etapas do job. real = segundos do início ao fim da tarefa na execução 931832972977407 (OB-42).
+  var ETAPAS = [
+    { id: "runsh", nome: "run.sh", real: 0, arquivo: "bash run.sh  →  databricks jobs run-now --json @jobs/run_padrao.json -p ft03",
+      passos: ["O PowerShell chama o Git Bash, que executa o run.sh.", "O run.sh pede à CLI do Databricks para disparar o job 700793012743568 com os parâmetros padrão (01 a 31/10/2026, magnitude 5).", "A CLI espera o job terminar (sem --no-wait) e devolve o JSON da execução."],
+      porque: "Comando único exigido pelo desafio: uma linha roda o pipeline inteiro, das APIs ao Parquet.",
+      metricas: [{ r: "tarefas no job", v: 7 }, { r: "parâmetros do job", v: 4 }],
+      chips: ["job_id 700793012743568", "data_inicio 2026-10-01", "data_fim 2026-10-31", "magnitude_minima 5"],
+      log: [["cmd", "PS> & \"C:\\Program Files\\Git\\bin\\bash.exe\" run.sh"], ["", "Disparando o job com jobs/run_padrao.json (perfil ft03)..."]] },
+    { id: "extracao", nome: "extracao", real: 143, arquivo: "notebooks/01_extracao_bronze  +  src/sismos_clima/extract.py",
+      passos: ["USGS count: quantos sismos M5+ existem no período (limite de 20.000 por consulta).", "USGS query: baixa o GeoJSON com os sismos, em ordem de tempo.", "limpar_raw: só depois de a USGS responder, apaga os JSON antigos do volume raw.", "Uma chamada ao Open-Meteo por sismo: clima do epicentro nas 24 horas do dia UTC, com 0,5 s entre chamadas.", "Erros 429, 5xx e timeout são repetidos com espera crescente; 400 para na hora.", "Grava extracao_relatorio.json com contagens e falhas."],
+      porque: "Controle de taxa evita o excesso; retentativa trata a falha que acontece mesmo assim. O bruto fica guardado para reprocessar sem chamar as APIs de novo.",
+      metricas: [{ r: "sismos (count da USGS)", v: 224, f: 89 }, { r: "chamadas às APIs", v: 226, f: 91 }, { r: "climas gravados", v: 224, f: 89 }, { r: "falhas de clima", v: 0 }],
+      chips: ["raw/usgs/eventos_2026-10-01_2026-10-31.json", "raw/open_meteo/<evento_id>.json x 224", "raw/extracao_relatorio.json"],
+      chipsFalha: ["raw/usgs/eventos_2026-10-01_2026-10-15.json", "raw/usgs/eventos_2026-10-01_2026-10-31.json (antigo, ficou)", "raw/open_meteo/<evento_id>.json", "raw/extracao_relatorio.json"],
+      log: [["", "USGS count: 224 (maxAllowed 20000)"], ["", "USGS query: 224 features"], ["", "limpar_raw: JSON antigos apagados"], ["", "Open-Meteo: 224 chamadas, 0 falhas"], ["ok", "extracao SUCCESS"]],
+      logFalha: [["", "USGS count: 89 (data_fim 2026-10-15)"], ["", "USGS query: 89 features"], ["erro", "raw ainda guarda o arquivo de 01 a 31/10 (antes da correção DT-09)"], ["", "Open-Meteo: 89 chamadas, 0 falhas"], ["ok", "extracao SUCCESS"]] },
+    { id: "bronze", nome: "bronze", real: 47, arquivo: "sql/bronze/01_bronze",
+      passos: ["read_files lê a pasta raw/usgs como tabela: 1 linha por arquivo, com a lista features dentro.", "read_files lê raw/open_meteo: 1 linha por sismo, com as listas hourly dentro.", "Acrescenta _arquivo (de onde veio) e _lido_em (quando foi lido). Nada é transformado."],
+      porque: "A bronze é a cópia fiel do que a API devolveu. Se uma regra mudar, dá para refazer a silver sem nova chamada.",
+      metricas: [{ r: "eventos dentro de usgs_resposta", v: 224, f: 313 }, { r: "linhas em meteo_resposta", v: 224 }, { r: "horas de clima (soma das listas)", v: 5376 }],
+      chips: ["bronze.usgs_resposta", "bronze.meteo_resposta"],
+      log: [["", "CREATE OR REPLACE TABLE bronze.usgs_resposta"], ["", "CREATE OR REPLACE TABLE bronze.meteo_resposta"], ["ok", "bronze SUCCESS"]],
+      logFalha: [["", "bronze.usgs_resposta lê 2 arquivos: 224 + 89 = 313 eventos"], ["ok", "bronze SUCCESS"]] },
+    { id: "silver", nome: "silver", real: 21, arquivo: "sql/silver/01_silver",
+      passos: ["explode(features): cada sismo da lista vira uma linha.", "LATERAL VIEW posexplode(hourly.time): cada hora vira uma linha e guarda a posição; a posição lê temperatura, umidade, chuva, vento e pressão nas outras listas.", "T1: milissegundos e texto ISO viram TIMESTAMP, números viram DOUBLE.", "T2: sem id, instante, magnitude ou coordenada a linha é rejeitada; clima nulo continua nulo.", "T3: deduplicação, fica a versão mais recente de cada sismo e de cada hora."],
+      porque: "O desafio pede o desaninhamento em SQL. A deduplicação é o que salva os dados quando o mesmo evento chega duas vezes.",
+      metricas: [{ r: "sismos na silver", v: 224 }, { r: "horas de clima na silver", v: 5376 }, { r: "rejeitados", v: 0 }, { r: "duplicados removidos", v: 0, f: 89 }],
+      chips: ["silver.sismos", "silver.clima_horario"],
+      log: [["", "explode(features) → 224 sismos"], ["", "posexplode(hourly.time) → 5376 horas"], ["ok", "silver SUCCESS"]],
+      logFalha: [["", "explode(features) → 313 linhas; deduplicação → 224 sismos"], ["ok", "silver SUCCESS"]] },
+    { id: "gold", nome: "gold", real: 18, arquivo: "sql/gold/01_gold",
+      passos: ["T4: JOIN de silver.sismos com silver.clima_horario por evento_id (o id vem do nome do arquivo de clima, não da coordenada).", "T5: horas_desde_sismo, periodo (antes, hora do sismo, depois), faixa de magnitude, média, amplitude e chuva do dia.", "Tabela PARTITIONED BY (ano, mes) com delta.parquet.compression.codec = SNAPPY."],
+      porque: "O Open-Meteo ajusta a coordenada à grade (36.1078 virou 36.098415); por isso o JOIN usa o id do evento.",
+      metricas: [{ r: "linhas na gold (224 x 24)", v: 5376 }, { r: "colunas", v: 22 }, { r: "linhas 'hora do sismo'", v: 224 }, { r: "faixas de magnitude", v: 3 }],
+      chips: ["gold.sismo_clima_horario", "partição ano=2026/mes=10", "SNAPPY"],
+      log: [["", "JOIN por evento_id → 5376 linhas"], ["ok", "gold SUCCESS"]] },
+    { id: "regras", nome: "regras", real: 15, arquivo: "sql/quality/02_regras",
+      passos: ["Calcula 10 regras em SQL: nulos (Q-02), unicidade (Q-04, Q-05a, Q-05b), intervalos (Q-06 a Q-08), completude (Q-09, Q-11) e consistência (Q-12).", "Grava o resultado de cada regra em gold.qualidade_regras.", "Roda o teste negativo: as mesmas expressões em dados inventados com defeito, para provar que detectam."],
+      porque: "Zero violações nos dados reais não prova que a regra funciona; o teste negativo prova.",
+      metricas: [{ r: "regras SQL", v: 10 }, { r: "violações", v: 0 }, { r: "testes negativos que detectaram", v: 10 }],
+      chips: ["gold.qualidade_regras"],
+      log: [["", "10 regras gravadas em gold.qualidade_regras"], ["ok", "regras SUCCESS"]] },
+    { id: "relatorio", nome: "relatorio", real: 11, arquivo: "notebooks/04_qualidade  +  src/sismos_clima/quality.py",
+      passos: ["Lê as 10 regras do SQL e soma as de Python: schema das 3 tabelas (Q-01a, Q-01b, Q-01c), taxa de nulos do clima (Q-03) e silver igual ao count da USGS (Q-10).", "Grava quality_report.json ANTES de decidir, para o diagnóstico ficar salvo mesmo na falha.", "exigir_aprovacao: se alguma regra de nível erro reprovou, a tarefa falha e a exportação não roda."],
+      porque: "Política de falha: nada é publicado com dado reprovado, e o relatório explica o motivo.",
+      metricas: [{ r: "regras no relatório", v: 15 }, { r: "Q-10: USGS x silver", v: "224 = 224", f: "89 ≠ 224", ruim: true }, { r: "violações na Q-10", v: 0, f: 135, ruim: true }, { r: "aprovado", v: "true", f: "false", ruim: true }],
+      chips: ["gold.export/reports/quality_report.json", "aprovado: true"],
+      chipsFalha: ["gold.export/reports/quality_report.json", "aprovado: false", "Q-10 reprovada: 135 violações"],
+      log: [["", "quality_report.json gravado: 15 regras, 15 aprovadas"], ["ok", "relatorio SUCCESS"]],
+      logFalha: [["", "quality_report.json gravado: Q-10 reprovada (89 contra 224)"], ["erro", "exigir_aprovacao: regra de erro reprovada"], ["erro", "relatorio FAILED (a plataforma repetiu a tarefa 3 vezes)"]], falhaAqui: true },
+    { id: "exportacao", nome: "exportacao", real: 22, arquivo: "notebooks/05_exportacao",
+      passos: ["Lê a gold e grava em Parquet: mode overwrite, partitionBy ano e mes, compression snappy.", "Lista os arquivos gravados: 1 .parquet em ano=2026/mes=10 e os arquivos de controle do Databricks.", "Lê o Parquet de volta: precisa ter as mesmas 5.376 linhas da gold.", "Abre o rodapé do arquivo com pyarrow: todas as colunas com compressão SNAPPY."],
+      porque: "O nome .snappy.parquet e a propriedade da tabela não provam a compressão; o rodapé do arquivo prova.",
+      metricas: [{ r: "linhas no Parquet", v: 5376 }, { r: "colunas no arquivo", v: 20 }, { r: "arquivos .parquet", v: 1 }, { r: "compressão no rodapé", v: "SNAPPY" }],
+      chips: ["gold.export/dataset/ano=2026/mes=10/part-...snappy.parquet", "_SUCCESS", "_committed_<id>", "_started_<id>"],
+      log: [["", "Parquet gravado em gold.export/dataset"], ["", "compressões no rodapé: {'SNAPPY'}"], ["ok", "exportacao SUCCESS"]],
+      logFalha: [["t", "exportacao SKIPPED: depende de relatorio, que falhou"]] },
+    { id: "fim", nome: "resultado", real: 0, arquivo: "run.sh: confere o result_state da execução",
+      passos: ["A CLI devolve o JSON da execução com o estado de cada tarefa.", "O run.sh lê o primeiro result_state, que é o da execução inteira.", "SUCCESS: mostra onde está o relatório e sai com código 0. Outro estado: avisa e sai com código 1.", "Depois, databricks fs cp copia o Parquet e o relatório para output/ no repositório."],
+      porque: "O databricks instalado pelo pip devolvia 0 mesmo na falha; conferir o result_state garante que quem chama o comando único saiba o resultado (OB-47).",
+      metricas: [{ r: "result_state", v: "SUCCESS", f: "FAILED" }, { r: "código de saída", v: 0, f: 1 }, { r: "duração total (s)", v: 281, f: "—" }, { r: "tarefas SUCCESS", v: 7, f: 5 }],
+      chips: ["output/dataset/ano=2026/mes=10/*.snappy.parquet", "output/reports/quality_report.json"],
+      chipsFalha: ["nada publicado", "quality_report.json com o motivo"],
+      log: [["ok", "\"result_state\": \"SUCCESS\""], ["ok", "Execução terminada com SUCCESS. Relatório: /Volumes/ft03_sismos_clima/gold/export/reports/quality_report.json"], ["cmd", "PS> $LASTEXITCODE"], ["ok", "0"]],
+      logFalha: [["erro", "Error: failed to reach TERMINATED or SKIPPED ... (mensagem da CLI, como no teste da OB-47)"], ["erro", "O job não terminou em SUCCESS."], ["cmd", "PS> $LASTEXITCODE"], ["erro", "1"]] }
+  ];
+
+  var BASE_MS = 7000;           // duração de cada etapa na animação, em 1x
+  var estado = { i: 0, t: 0, tocando: false, vel: 1, falha: false, ultimo: null, reqId: null, logFeito: {} };
+  var $ = function (id) { return document.getElementById(id); };
+  var trilha = $("trilha"), barra = $("barra"), term = $("terminal");
+
+  // ------------------------------------------------ montagem da trilha
+  ETAPAS.forEach(function (e, k) {
+    var d = document.createElement("div");
+    d.className = "no"; d.tabIndex = 0; d.setAttribute("role", "button");
+    d.setAttribute("aria-label", "Etapa " + k + ": " + e.nome);
+    d.innerHTML = '<span class="marca" aria-hidden="true"></span><div class="num">' + (k === 0 ? "início" : k === ETAPAS.length - 1 ? "fim" : "tarefa " + k) + '</div><div class="nome">' + e.nome + '</div><div class="seg-real">' + (e.real ? e.real + " s" : "&nbsp;") + "</div>";
+    d.addEventListener("click", function () { irPara(k); });
+    d.addEventListener("keydown", function (ev) { if (ev.key === "Enter") irPara(k); });
+    trilha.appendChild(d);
+  });
+
+  function etapaFinalFalha() { for (var k = 0; k < ETAPAS.length; k++) if (ETAPAS[k].falhaAqui) return k; return -1; }
+  function valor(m) { return estado.falha && m.f !== undefined ? m.f : m.v; }
+  function fmt(n) { return typeof n === "number" ? n.toLocaleString("pt-BR") : n; }
+  function mmss(s) { s = Math.round(s); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+  
+  // ------------------------------------------------ desenho de uma etapa
+  function montarEtapa() {
+    var e = ETAPAS[estado.i], kf = etapaFinalFalha();
+    $("titulo").textContent = (estado.i === 0 ? "Início" : estado.i === ETAPAS.length - 1 ? "Resultado" : "Tarefa " + estado.i + ": " + e.nome) + (e.real ? " · " + e.real + " s" : "");
+    $("arquivo").textContent = e.arquivo;
+    $("passos").innerHTML = e.passos.map(function (p) { return "<li>" + p + "</li>"; }).join("");
+    $("porque").innerHTML = "<b>Por quê:</b> " + e.porque;
+    $("metricas").innerHTML = e.metricas.map(function (m, j) {
+      var ruim = estado.falha && (m.ruim || e.id === "fim") && m.f !== undefined;
+      return '<div class="metrica' + (ruim ? " ruim" : "") + '"><div class="v" data-alvo="' + valor(m) + '">0</div><div class="r">' + m.r + "</div></div>";
+    }).join("");
+    var chips = (estado.falha && e.chipsFalha) ? e.chipsFalha : e.chips;
+    $("chips").innerHTML = chips.map(function (c) {
+      var cl = /reprovada|false|nada publicado/.test(c) ? " erro" : /aprovado: true|SNAPPY/.test(c) ? " ok" : "";
+      return '<span class="chip' + cl + '">' + c + "</span>";
+    }).join("");
+    // estado visual da trilha
+    var nos = trilha.children;
+    for (var k = 0; k < nos.length; k++) {
+      var n = nos[k]; n.className = "no";
+      var marca = n.querySelector(".marca");
+      if (estado.falha && kf >= 0 && k > kf && k < ETAPAS.length - 1) { n.className += " pulado"; marca.textContent = ""; continue; }
+      if (k < estado.i) {
+        if (estado.falha && k === kf) { n.className += " falhou"; marca.textContent = "✕"; }
+        else { n.className += " feito"; marca.textContent = "✓"; }
+      } else if (k === estado.i) n.className += " ativo";
+    }
+    barra.className = "barra" + (estado.falha && estado.i >= kf ? " falha" : "");
+  }
+
+  function logar(e) {
+    var linhas = (estado.falha && e.logFalha) ? e.logFalha : e.log;
+    var chave = estado.i + (estado.falha ? "f" : "s");
+    if (estado.logFeito[chave]) return;
+    estado.logFeito[chave] = true;
+    linhas.forEach(function (l, j) {
+      setTimeout(function () {
+        var p = document.createElement("div");
+        p.innerHTML = '<span class="t">[' + (estado.falha ? "--:--" : mmss(tempoReal())) + ']</span> <span class="' + (l[0] || "") + '">' + l[1].replace(/</g, "&lt;") + "</span>";
+        term.appendChild(p); term.scrollTop = term.scrollHeight;
+      }, j * 350 / estado.vel);
+    });
+  }
+
+  // tempo real equivalente: soma das etapas anteriores + fração da atual
+  function tempoReal() {
+    var s = 0;
+    for (var k = 0; k < estado.i; k++) s += ETAPAS[k].real;
+    return s + ETAPAS[estado.i].real * Math.min(estado.t, 1);
+  }
+
+  // ------------------------------------------------ quadro a quadro
+  function atualizar() {
+    var e = ETAPAS[estado.i], t = Math.min(estado.t, 1);
+    var lis = $("passos").children, n = lis.length;
+    for (var k = 0; k < n; k++) {
+      var vis = t >= k / n;
+      lis[k].classList.toggle("visivel", vis);
+      lis[k].classList.toggle("atual", vis && t < (k + 1) / n && t < 1);
+    }
+    $("metricas").querySelectorAll(".v").forEach(function (v) {
+      var alvo = v.getAttribute("data-alvo"), num = Number(alvo);
+      if (alvo === "" || isNaN(num)) v.textContent = t > 0.35 ? alvo : "…";
+      else v.textContent = fmt(Math.round(num * Math.min(t / 0.8, 1)));
+    });
+    var chips = $("chips").children;
+    for (var c = 0; c < chips.length; c++) chips[c].classList.toggle("visivel", t >= 0.3 + 0.6 * c / chips.length);
+    if (t >= 0.5) logar(e);
+    var kf = etapaFinalFalha();
+    var ultimo = estado.falha ? kf + 1 : ETAPAS.length;
+    var feito = (estado.i + t) / ultimo;
+    barra.firstElementChild.style.width = Math.min(feito * 100, 100) + "%";
+    $("relogio").textContent = estado.falha ? "—" : mmss(tempoReal());
+  }
+
+  function quadro(agora) {
+    if (!estado.tocando) return;
+    var dt = estado.ultimo == null ? 0 : agora - estado.ultimo;
+    estado.ultimo = agora;
+    estado.t += dt * estado.vel / BASE_MS;
+    if (estado.t >= 1) {
+      estado.t = 1; atualizar();
+      var kf = etapaFinalFalha();
+      var fim = estado.i >= ETAPAS.length - 1 || (estado.falha && estado.i === kf);
+      if (estado.falha && estado.i === kf) { estado.i = ETAPAS.length - 1; estado.t = 0; montarEtapa(); marcarFalha(); atualizar(); estado.reqId = requestAnimationFrame(quadro); return; }
+      if (fim) { pausar(); return; }
+      estado.i++; estado.t = 0; montarEtapa();
+    }
+    atualizar();
+    estado.reqId = requestAnimationFrame(quadro);
+  }
+  function marcarFalha() {
+    var kf = etapaFinalFalha(), n = trilha.children[kf];
+    n.className = "no falhou"; n.querySelector(".marca").textContent = "✕";
+  }
+
+  function tocar() {
+    if (estado.i >= ETAPAS.length - 1 && estado.t >= 1) reiniciar();
+    estado.tocando = true; estado.ultimo = null;
+    $("btPlay").textContent = "⏸ Pausar"; $("btPlay").setAttribute("aria-label", "Pausar");
+    estado.reqId = requestAnimationFrame(quadro);
+  }
+  function pausar() {
+    estado.tocando = false; cancelAnimationFrame(estado.reqId);
+    $("btPlay").textContent = estado.i >= ETAPAS.length - 1 && estado.t >= 1 ? "↺ De novo" : "▶ Play";
+    $("btPlay").setAttribute("aria-label", "Reproduzir");
+  }
+  function irPara(k) {
+    var kf = etapaFinalFalha();
+    if (estado.falha && k > kf && k < ETAPAS.length - 1) k = ETAPAS.length - 1;
+    // ao pular, registra no terminal as etapas anteriores ainda não escritas
+    for (var j = 0; j < k; j++) { if (estado.falha && j > kf) continue; var si = estado.i, st = estado.t; estado.i = j; estado.t = 1; logar(ETAPAS[j]); estado.i = si; estado.t = st; }
+    estado.i = k; estado.t = estado.tocando ? 0 : 1; montarEtapa();
+    if (estado.falha && k === ETAPAS.length - 1) marcarFalha();
+    atualizar();
+  }
+  function reiniciar() {
+    pausar(); estado.i = 0; estado.t = 0; estado.logFeito = {}; term.innerHTML = "";
+    montarEtapa(); atualizar(); $("btPlay").textContent = "▶ Play";
+  }
+  function anterior() {
+    var k = estado.i - 1, kf = etapaFinalFalha();
+    if (estado.falha && estado.i === ETAPAS.length - 1) k = kf;
+    if (k >= 0) irPara(k);
+  }
+  function proxima() {
+    var kf = etapaFinalFalha(), k = estado.i + 1;
+    if (estado.falha && estado.i === kf) k = ETAPAS.length - 1;
+    if (k < ETAPAS.length) irPara(k);
+  }
+  function cenario(falha) {
+    estado.falha = falha;
+    $("cenOk").setAttribute("aria-pressed", String(!falha));
+    $("cenFalha").setAttribute("aria-pressed", String(falha));
+    $("total").textContent = falha ? "tempos do teste A5 não registrados" : "04:37 (soma das 7 tarefas)";
+    reiniciar();
+  }
+
+  $("btPlay").addEventListener("click", function () { estado.tocando ? pausar() : tocar(); });
+  $("btAnt").addEventListener("click", function () { pausar(); anterior(); });
+  $("btProx").addEventListener("click", function () { pausar(); proxima(); });
+  $("btReini").addEventListener("click", reiniciar);
+  $("selVel").addEventListener("change", function () { estado.vel = Number(this.value); });
+  $("cenOk").addEventListener("click", function () { cenario(false); });
+  $("cenFalha").addEventListener("click", function () { cenario(true); });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.target.tagName === "SELECT") return;
+    if (ev.key === " ") { ev.preventDefault(); estado.tocando ? pausar() : tocar(); }
+    else if (ev.key === "ArrowRight") { pausar(); proxima(); }
+    else if (ev.key === "ArrowLeft") { pausar(); anterior(); }
+  });
+
+  montarEtapa(); atualizar();
+  window.__animacao = { estado: estado, ETAPAS: ETAPAS };  // usado só nos testes
+})();
+</script>
+</body>
+</html>

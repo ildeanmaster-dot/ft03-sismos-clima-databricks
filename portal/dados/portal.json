@@ -82,6 +82,18 @@
       "sub": "Roteiro passo a passo para a equipe técnica, com diagramas e números das execuções"
     },
     {
+      "id": "roteiro",
+      "t": "Roteiro de execução",
+      "doc": "docs/04-apresentacao/roteiro-de-execucao.md",
+      "sub": "Comandos da apresentação, na ordem: o que cada um faz e o resultado esperado"
+    },
+    {
+      "id": "animacao",
+      "t": "Execução animada",
+      "doc": "docs/04-apresentacao/execucao-animada.md",
+      "sub": "Dê play para ver o fluxo etapa por etapa, no cenário de sucesso ou de falha"
+    },
+    {
       "g": "Negócio"
     },
     {

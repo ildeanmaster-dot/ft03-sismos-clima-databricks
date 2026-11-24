@@ -7,6 +7,8 @@
 |---|---|
 | Painel e Progresso | `docs/00-gestao/estado-do-projeto.md`, regras, requisitos, débitos, pendências e CHANGELOG |
 | Apresentação técnica | `docs/04-apresentacao/apresentacao-tecnica.md` (diagramas Mermaid) |
+| Roteiro de execução | `docs/04-apresentacao/roteiro-de-execucao.md` |
+| Execução animada | `docs/04-apresentacao/execucao-animada.md`, que incorpora `execucao-animada.html` (arquivo separado, abre também sozinho) |
 | Termo, Regras, Requisitos, Decisões | documentos de `docs/00-gestao` e `docs/01-negocio` |
 | Arquitetura e processo | blocos `mermaid` de `docs/02-arquitetura/arquitetura-da-solucao.md` e `diagramas.md`, um por aba |
 | Débito técnico, Observações, Riscos, Histórico | documentos correspondentes |
