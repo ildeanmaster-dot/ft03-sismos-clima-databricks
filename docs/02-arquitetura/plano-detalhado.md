@@ -1,5 +1,5 @@
 # Plano detalhado
-Versão 0.1 · 23/11/2026 · **Proposta para aprovação. Nada disto está implementado.**
+Versão 0.2 · 24/11/2026 · Aprovado em 23/11/2026 e implementado; o estado de cada etapa está em `docs/00-gestao/estado-do-projeto.md` e as diferenças de execução nas OB (ex.: job com 7 tarefas, JOIN por `evento_id`).
 
 ## 1. Base: o que a Etapa 0 provou
 | Fato | Evidência |
