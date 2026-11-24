@@ -45,7 +45,7 @@ Job `ft03-sismos-clima-pipeline` (`jobs/ft03_pipeline.json`), 7 tarefas em sequ�
 | Caminho | Conteúdo |
 |---|---|
 | `src/sismos_clima/` | Pacote Python modular e tipado: `config`, `http_client`, `extract`, `quality` |
-| `notebooks/` | Notebooks Python do job |
+| `notebooks/` | Notebooks Python do job e `validacao_do_pipeline` (confere cada camada, só leitura) |
 | `sql/` | Notebooks SQL de bronze, silver, gold e qualidade |
 | `jobs/` | Definição do job e corpos do `run-now` |
 | `tests/` | 34 testes com pytest e amostras em `fixtures/` |
@@ -115,6 +115,11 @@ Atualizar `output/` depois de uma execução:
 databricks fs cp -r "dbfs:/Volumes/ft03_sismos_clima/gold/export/dataset" output/dataset --overwrite -p ft03
 databricks fs cp "dbfs:/Volumes/ft03_sismos_clima/gold/export/reports/quality_report.json" output/reports/quality_report.json --overwrite -p ft03
 ```
+
+### Pelo Databricks, sem terminal
+1. Git folder → Pull.
+2. **Jobs & Pipelines** → `ft03-sismos-clima-pipeline` → **Run now** (outro período: **Run now with different parameters**). Execução de 24/11/2026: 7 tarefas `Succeeded` em 4m 35s.
+3. `notebooks/validacao_do_pipeline` com compute **Serverless** → **Run all**: confere extração, desaninhamento, JOIN, qualidade e a compressão no rodapé do Parquet, só com leitura.
 
 ## 8. Testes
 ```bash

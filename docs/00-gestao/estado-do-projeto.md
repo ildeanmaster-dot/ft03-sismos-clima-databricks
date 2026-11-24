@@ -1,5 +1,5 @@
 # Estado do projeto
-Versão 0.2 · 24/11/2026
+Versão 0.3 · 24/11/2026
 
 | Etapa | Situação | O que falta |
 |---|---|---|
@@ -28,9 +28,13 @@ Versão 0.2 · 24/11/2026
 | Testes unitários | Implementado | 34 passed no Linux e no Windows (OB-45, OB-46) |
 | `output/` (dataset e relatório) | Versionado | OB-43 |
 | README e clone limpo | Validado | OB-46 |
+| Notebook de validação (`notebooks/validacao_do_pipeline`) | Validado | 25 células só de leitura, Serverless, sem erro (OB-51) |
 | Portal do projeto (`portal/index.html`) | Gerado | 16 rotas e 14 diagramas sem erro (OB-48); regerar com `python portal/gerar_portal.py` |
 
 | # | Ação | Quem |
 |---|---|---|
 | 1 | Aguardar o aceite da 2ª entrega pela turma (P-05) | Ildean |
-| 2 | Abertos: DT-03 (licença), DT-04 e A7 (taxa da USGS), DT-05 (catálogo nos SQL), DT-07 (Q-06 fixa), DT-08 (`executado_em`), A9 (`endtime`), versão do `requests` no serverless, limpeza de `raw/_teste`, P-05 (aceite da 2ª entrega) e E9 portal (opcional) | Ildean e Claude |
+| 2 | Débitos abertos: DT-03 (licença), DT-04 (taxa da USGS), DT-05 (catálogo nos SQL), DT-07 (Q-06 fixa), DT-08 (`executado_em`), DT-10 (`raw/_teste`) e DT-11 (rascunhos na Home) | Ildean e Claude |
+| 3 | A validar: A7 (taxa da USGS), A9 (`endtime` só com data) e A11 (versão do `requests` no serverless) | Claude, com teste no workspace |
+| 4 | Fora deste repositório: levar a leitura de `P-05`/`D-05` do gerador do portal aos portais da Monte Bravo; apagar `D:\Portifolio\clone-limpo-ft03`; e-mail do workspace segue no histórico antigo do Git (OB-13), mantido por decisão do responsável | Ildean e Claude |
+| 5 | Novos ensaios da apresentação: `notebooks/validacao_do_pipeline` e o Roteiro de execução (seção 0) | Ildean |

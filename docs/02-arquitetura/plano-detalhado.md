@@ -139,3 +139,4 @@ Gold lido em Spark e gravado em Parquet Snappy, particionado por ano e mês, em 
 | A8 | Sintaxe de `posexplode` com índice nas demais listas (resolvida em 23/11/2026, OB-24) |
 | A9 | `endtime` da USGS recebendo só a data: confirmar se o limite é 00:00 UTC do dia informado (por isso a config usa o dia seguinte ao fim, `data_fim_exclusiva`) |
 | A10 | Diretório atual de um notebook dentro do Git folder no serverless (resolvida em 23/11/2026, OB-19) |
+| A11 | Versão do `requests` no ambiente serverless (o job usa a do ambiente; o `requirements.txt` fixa 2.34.2 para os testes locais) |

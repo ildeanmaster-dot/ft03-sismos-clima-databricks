@@ -11,6 +11,7 @@
 - Teste negativo de Q-05a, Q-05b, Q-09 e Q-11 em `02_regras`: as 10 regras SQL detectam defeito (OB-44).
 - Requisitos revisados com evidência: 15 de 15 atendidos, ressalvas registradas (OB-45); `tests/README.md` e README completo na ordem planejada.
 - Esboços `notebooks/02_silver.sql` e `notebooks/03_gold.sql` removidos (DT-06).
+- Documentação consolidada: pendências no estado do projeto, DT-10 e DT-11 (limpeza do workspace), A11 (versão do `requests`), README com a execução pelo Databricks e índice de `docs/` com `04-apresentacao`.
 - Clone limpo validado: LF do `run.sh`, 34 testes no Windows e comando único com `SUCCESS` (OB-46). E8 concluída.
 - `run.sh` confere o `result_state` e sai com 1 se o job não terminar em `SUCCESS`; aceita o corpo do `run-now` como argumento (OB-47).
 - Portal do projeto (`portal/`) com a aba Apresentação técnica; regras, decisões, arquitetura e diagramas atualizados para o que foi construído (OB-48).

@@ -1,5 +1,5 @@
 # Documentação — FT03 Sismos × Clima no Databricks
-Versão 0.1 · 23/11/2026
+Versão 0.2 · 24/11/2026
 
 | Pasta | Documentos |
 |---|---|
@@ -7,5 +7,6 @@ Versão 0.1 · 23/11/2026
 | `01-negocio` | requisitos, regras-de-negocio, glossario |
 | `02-arquitetura` | arquitetura-da-solucao, diagramas, plano-detalhado |
 | `03-tecnico` | fontes-de-dados |
+| `04-apresentacao` | apresentacao-tecnica, roteiro-de-execucao, execucao-animada (página `.md` e animação `.html`) |
 
 Regra: nada inferido. O que não está em documentação oficial ou em teste real fica **A validar**.
