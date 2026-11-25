@@ -1,5 +1,9 @@
 """Validações de qualidade: schema, nulos, contagem da USGS e relatório JSON.
 
+O que faz: calcula as regras feitas em Python, monta e grava o relatório e aplica a política de falha.
+O que contém: `ResultadoRegra`, `resultado_de_linha`, `comparar_schema`, `verificar_schema`, `taxa_nulos`, `verificar_nulos_clima`, `verificar_contagem_usgs`, `montar_relatorio`, `gravar_relatorio`, `exigir_aprovacao` e `ErroQualidade`.
+Resultado esperado: `quality_report.json` gravado antes da decisão; `exigir_aprovacao` levanta `ErroQualidade` se alguma regra de nível erro estiver reprovada.
+
 Tudo aqui é função pura: o notebook lê os dados no Spark e passa os números prontos.
 Assim cada regra se testa com entradas pequenas, sem cluster.
 """

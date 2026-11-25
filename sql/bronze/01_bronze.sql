@@ -1,4 +1,18 @@
 -- Databricks notebook source
+-- DBTITLE 1,Resumo do arquivo
+-- MAGIC %md
+-- MAGIC # 01_bronze (SQL)
+-- MAGIC **O que faz:** cria a camada bronze: lê o JSON bruto do volume `bronze.raw` sem transformar. Tarefa `bronze` do job.
+-- MAGIC
+-- MAGIC **O que contém:**
+-- MAGIC - `bronze.usgs_resposta`: 1 linha por arquivo da USGS (`type`, `metadata`, `bbox`, `features` como lista, `_arquivo`, `_lido_em`)
+-- MAGIC - `bronze.meteo_resposta`: 1 linha por sismo (`latitude`/`longitude` do ponto de grade, `elevation`, `hourly` com listas paralelas, `_arquivo`, `_lido_em`)
+-- MAGIC - conferências de contagem no fim
+-- MAGIC
+-- MAGIC **Resultado esperado:** `usgs_resposta` com 1 linha cuja lista `features` traz todos os sismos do período; `meteo_resposta` com 1 linha por sismo. As tabelas são recriadas inteiras: reexecutar não duplica.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Criar bronze.usgs_resposta
 -- Bronze da USGS: 1 linha por arquivo de resposta, exatamente como a API devolveu
 CREATE OR REPLACE TABLE ft03_sismos_clima.bronze.usgs_resposta AS  -- recria a tabela inteira: reexecutar não duplica linhas

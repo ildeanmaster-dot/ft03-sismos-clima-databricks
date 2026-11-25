@@ -3,6 +3,22 @@
 # [tool.databricks.environment]
 # environment_version = "6"
 # ///
+# DBTITLE 1,Resumo do arquivo
+# MAGIC %md
+# MAGIC # 04_qualidade
+# MAGIC **O que faz:** reúne as regras de qualidade, grava o relatório e decide se a execução pode seguir. É a tarefa `relatorio` do job. Lógica em `src/sismos_clima/quality.py`.
+# MAGIC
+# MAGIC **O que contém:**
+# MAGIC - leitura das 10 regras calculadas em SQL (`gold.qualidade_regras`, criada por `sql/quality/02_regras`)
+# MAGIC - 5 regras calculadas em Python: schemas das 3 tabelas (Q-01a, Q-01b, Q-01c), proporção de nulos do clima (Q-03, aviso) e comparação da silver com a contagem da USGS (Q-10)
+# MAGIC - contagem de registros por camada e de rejeitados
+# MAGIC - gravação de `quality_report.json` antes da decisão
+# MAGIC - política de falha: regra de nível erro reprovada interrompe a tarefa
+# MAGIC
+# MAGIC **Resultado esperado:** relatório em `/Volumes/<catalogo>/gold/export/reports/quality_report.json` com 15 regras e `aprovado` verdadeiro; se alguma regra de erro reprovar, a tarefa falha e `exportacao` não roda.
+
+# COMMAND ----------
+
 # DBTITLE 1,Preparar import dos módulos
 import os  # consulta a pasta atual do notebook
 import sys  # controla onde o Python procura pacotes

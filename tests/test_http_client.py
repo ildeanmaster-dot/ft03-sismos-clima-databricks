@@ -1,4 +1,8 @@
-"""Testes do cliente HTTP: sucesso, 429 com Retry-After, 5xx, timeout, erro permanente e esgotamento."""
+"""Testes do cliente HTTP: sucesso, 429 com Retry-After, 5xx, timeout, erro permanente e esgotamento.
+
+O que faz: prova o controle de taxa e as retentativas sem rede, com respostas simuladas.
+Resultado esperado: 8 testes aprovados.
+"""
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional

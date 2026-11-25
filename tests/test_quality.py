@@ -1,4 +1,8 @@
-"""Testes das regras e do relatório de qualidade (funções puras, sem Spark)."""
+"""Testes das regras e do relatório de qualidade (funções puras, sem Spark).
+
+O que faz: confere schema, nulos, contagem da USGS, relatório e política de falha com entradas inventadas.
+Resultado esperado: 13 testes aprovados.
+"""
 import json
 import sys
 from pathlib import Path

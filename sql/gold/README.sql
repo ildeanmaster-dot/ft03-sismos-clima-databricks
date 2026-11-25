@@ -1,1 +1,1 @@
--- SQL da camada gold. A implementar após a aprovação do plano.
+-- Camada gold: o SQL está em 01_gold.sql (tarefa `gold` do job). Ele faz o JOIN (T4), calcula as métricas (T5) e cria `gold.sismo_clima_horario`.

@@ -1,4 +1,18 @@
 -- Databricks notebook source
+-- DBTITLE 1,Resumo do arquivo
+-- MAGIC %md
+-- MAGIC # 01_silver (SQL)
+-- MAGIC **O que faz:** cria a camada silver: desaninha as listas da bronze e aplica as transformações T1 (tipos e datas), T2 (nulos) e T3 (deduplicação). Tarefa `silver` do job.
+-- MAGIC
+-- MAGIC **O que contém:**
+-- MAGIC - `silver.sismos`: 12 colunas, 1 linha por sismo (`explode(features)`; deduplicação por `evento_id` com `QUALIFY row_number()`, mantendo a versão de `atualizado_em` mais recente)
+-- MAGIC - `silver.clima_horario`: 10 colunas, 1 linha por sismo e hora (`posexplode(hourly.time)` guarda a posição para ler as listas paralelas)
+-- MAGIC - conferências de contagem e de nulos no fim
+-- MAGIC
+-- MAGIC **Resultado esperado:** `silver.sismos` com 1 linha por sismo da USGS e `silver.clima_horario` com 24 linhas por sismo. Linha sem chave, instante, magnitude ou coordenada é rejeitada; clima nulo continua nulo. Tabelas recriadas inteiras.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Fixar fuso UTC
 SET TIME ZONE 'UTC';  -- datas e horas desta sessão passam a ser calculadas e exibidas em UTC
 SELECT current_timezone() AS fuso;  -- confirma o fuso da sessão (esperado: UTC)
@@ -97,8 +111,8 @@ QUALIFY row_number() OVER (PARTITION BY evento_id, hora_utc ORDER BY _lido_em DE
 
 -- DBTITLE 1,Conferir silver.clima_horario
 SELECT
-  count(*) AS linhas,  -- esperado 5376
-  count(DISTINCT evento_id) AS sismos,  -- esperado 224
+  count(*) AS linhas,  -- esperado: sismos x 24
+  count(DISTINCT evento_id) AS sismos,  -- esperado: 1 por sismo da USGS
   min(hora_utc) AS primeira_hora,  -- primeira hora
   max(hora_utc) AS ultima_hora,  -- última hora
   count_if(temperatura_c IS NULL) AS sem_temperatura,  -- nulos de temperatura

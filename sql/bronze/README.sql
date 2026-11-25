@@ -1,1 +1,1 @@
--- SQL da camada bronze. A implementar após a aprovação do plano.
+-- Camada bronze: o SQL está em 01_bronze.sql (tarefa `bronze` do job). Ele lê o JSON bruto do volume `bronze.raw` e cria `bronze.usgs_resposta` e `bronze.meteo_resposta`.

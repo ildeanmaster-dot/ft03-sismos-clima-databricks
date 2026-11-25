@@ -1,5 +1,9 @@
 """Extração da USGS (GeoJSON) e do Open-Meteo (horário) para o volume bronze.
 
+O que faz: monta os parâmetros das chamadas, extrai as duas APIs e grava o JSON bruto.
+O que contém: funções puras de parâmetros (`filtros_usgs`, `parametros_query_usgs`, `dia_utc`, `parametros_meteo`), `gravar_json`, `limpar_raw`, `extrair` e `ErroExtracao`.
+Resultado esperado: a pasta `raw` com 1 arquivo da USGS, 1 arquivo do Open-Meteo por sismo e `extracao_relatorio.json`.
+
 Funções puras montam os parâmetros das chamadas a partir da configuração e de um evento.
 `extrair` orquestra as chamadas e grava o JSON bruto na pasta `raw` do volume:
     usgs/eventos_<inicio>_<fim>.json   uma resposta GeoJSON com todos os sismos

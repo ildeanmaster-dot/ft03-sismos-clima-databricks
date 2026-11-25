@@ -3,6 +3,24 @@
 # [tool.databricks.environment]
 # environment_version = "6"
 # ///
+# DBTITLE 1,Resumo do arquivo
+# MAGIC %md
+# MAGIC # 05_exportacao
+# MAGIC **O que faz:** exporta a tabela gold para Parquet com compressão Snappy, particionado por ano e mês. É a última tarefa (`exportacao`) do job.
+# MAGIC
+# MAGIC **O que contém:**
+# MAGIC - leitura do parâmetro `catalogo` e definição de origem e destino
+# MAGIC - gravação com `overwrite`, `partitionBy("ano", "mes")` e compressão `snappy` (reexecutar não duplica)
+# MAGIC - listagem dos arquivos gravados
+# MAGIC - leitura de volta do Parquet e comparação com a gold
+# MAGIC - prova do Snappy no rodapé do arquivo (pyarrow)
+# MAGIC
+# MAGIC **Resultado esperado:** pasta `/Volumes/<catalogo>/gold/export/dataset/ano=AAAA/mes=M/` com 1 arquivo Parquet por mês do período; linhas lidas iguais às da gold (sismos × 24 horas); 20 colunas no arquivo (ano e mês ficam no caminho); compressão `{'SNAPPY'}`.
+# MAGIC
+# MAGIC Atenção: a célula de gravação regrava o dataset; rode-a só pelo job.
+
+# COMMAND ----------
+
 # DBTITLE 1,Ler parâmetros
 dbutils.widgets.text("catalogo", "ft03_sismos_clima", "Catálogo do Unity Catalog")  # cria o campo com valor padrão; no job, o parâmetro catalogo sobrescreve
 catalogo = dbutils.widgets.get("catalogo")  # lê o valor do campo
@@ -22,7 +40,7 @@ linhas_gold = gold.count()  # quantidade de linhas da gold, para comparar depois
     .option("compression", "snappy")  # declara Snappy, sem depender do padrão da sessão
     .parquet(destino)  # grava em Parquet na pasta do volume
 )  # fim da gravação
-print("linhas na gold:", linhas_gold)  # esperado 5376 para out/2026
+print("linhas na gold:", linhas_gold)  # esperado: sismos da silver × 24 horas
 
 # COMMAND ----------
 
@@ -41,7 +59,7 @@ print("outros arquivos:", outros)  # arquivos de controle que o Spark grava junt
 # DBTITLE 1,Ler de volta e comparar com a gold
 lido = spark.read.parquet(destino)  # lê o dataset exportado; ano e mes voltam pelos nomes das pastas
 linhas_lidas = lido.count()  # linhas no Parquet
-print("linhas lidas:", linhas_lidas, "colunas:", len(lido.columns))  # esperado 5376 linhas e 22 colunas
+print("linhas lidas:", linhas_lidas, "colunas:", len(lido.columns))  # esperado: o mesmo número de linhas da gold e 20 colunas (ano e mês ficam no caminho)
 if linhas_lidas != linhas_gold:  # o export tem de ter as mesmas linhas da gold
     raise RuntimeError(f"Parquet com {linhas_lidas} linhas, gold com {linhas_gold}")  # para com mensagem clara
 print("contagem confere com a gold")  # só chega aqui se for igual

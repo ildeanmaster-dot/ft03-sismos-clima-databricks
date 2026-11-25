@@ -1,4 +1,18 @@
 -- Databricks notebook source
+-- DBTITLE 1,Resumo do arquivo
+-- MAGIC %md
+-- MAGIC # 01_perfil (SQL)
+-- MAGIC **O que faz:** olha os dados reais da gold antes de definir os limites das regras de qualidade. Só leitura.
+-- MAGIC
+-- MAGIC **O que contém:**
+-- MAGIC - mínimo, máximo, média e nulos de cada variável climática (temperatura, umidade, precipitação, vento, pressão)
+-- MAGIC
+-- MAGIC **Resultado esperado:** uma linha por variável com a faixa observada, usada para escolher os intervalos válidos de `02_regras`. Não cria tabela e não é uma regra.
+-- MAGIC
+-- MAGIC Não faz parte do job.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Fixar fuso UTC
 SET TIME ZONE 'UTC';  -- datas e horas desta sessão passam a ser calculadas e exibidas em UTC
 SELECT current_timezone() AS fuso;  -- confirma o fuso da sessão (esperado: UTC)

@@ -1,4 +1,18 @@
 -- Databricks notebook source
+-- DBTITLE 1,Resumo do arquivo
+-- MAGIC %md
+-- MAGIC # 02_regras (SQL)
+-- MAGIC **O que faz:** calcula as 10 regras de qualidade que podem ser verificadas em SQL. Tarefa `regras` do job.
+-- MAGIC
+-- MAGIC **O que contém:**
+-- MAGIC - `gold.qualidade_regras`: 1 linha por regra, com `regra_id`, `descricao`, `nivel`, `tipo`, `verificados`, `violacoes` e `status`
+-- MAGIC - status `aprovada` quando `violacoes = 0`, senão `reprovada`
+-- MAGIC - as outras 5 regras (schema, nulos do clima e contagem da USGS) são calculadas em Python por `notebooks/04_qualidade`
+-- MAGIC
+-- MAGIC **Resultado esperado:** tabela com 10 linhas, todas `aprovada` quando os dados estão corretos. Cada regra tem teste negativo com dados inventados para provar que detecta violação. Tabela recriada inteira.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Fixar fuso UTC
 SET TIME ZONE 'UTC';  -- a regra Q-12 converte hora em data, e essa conversão depende do fuso da sessão
 SELECT current_timezone() AS fuso;  -- confirma o fuso da sessão (esperado: UTC)

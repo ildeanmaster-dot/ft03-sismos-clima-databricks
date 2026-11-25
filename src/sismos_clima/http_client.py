@@ -1,5 +1,9 @@
 """Cliente HTTP único com controle de taxa e retentativas (429, 5xx, timeout).
 
+O que faz: centraliza toda chamada HTTP do pipeline.
+O que contém: `LimitadorTaxa`, as exceções `ErroHttp`, `ErroPermanente` e `ErroTentativasEsgotadas`, e `ClienteHttp.get_json`.
+Resultado esperado: `get_json` devolve o JSON da resposta; erro transitório é repetido com espera crescente e jitter; erro permanente (como 400) falha na hora; esgotadas as tentativas, levanta `ErroTentativasEsgotadas`.
+
 Controle de taxa (LimitadorTaxa) e retentativa são tarefas distintas: o primeiro evita
 chamar rápido demais; a segunda trata falhas que acontecem mesmo assim.
 """

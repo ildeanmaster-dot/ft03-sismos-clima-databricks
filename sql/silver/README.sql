@@ -1,1 +1,1 @@
--- SQL da camada silver. A implementar após a aprovação do plano.
+-- Camada silver: o SQL está em 01_silver.sql (tarefa `silver` do job). Ele desaninha a bronze e cria `silver.sismos` e `silver.clima_horario` (T1 a T3).

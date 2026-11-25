@@ -1,4 +1,19 @@
 -- Databricks notebook source
+-- DBTITLE 1,Resumo do arquivo
+-- MAGIC %md
+-- MAGIC # 01_gold (SQL)
+-- MAGIC **O que faz:** cria a camada gold: cruza sismos e clima (T4) e calcula as métricas derivadas (T5). Tarefa `gold` do job.
+-- MAGIC
+-- MAGIC **O que contém:**
+-- MAGIC - T4: `INNER JOIN` entre `silver.sismos` e `silver.clima_horario` por `evento_id` (não por coordenada, porque o Open-Meteo ajusta o ponto à grade)
+-- MAGIC - T5: `horas_desde_sismo`, `faixa_magnitude`, `periodo` e janelas (média, amplitude e soma de chuva)
+-- MAGIC - `gold.sismo_clima_horario`: 22 colunas, `PARTITIONED BY (ano, mes)`, propriedade `delta.parquet.compression.codec = SNAPPY`
+-- MAGIC - conferências de contagem, de unicidade e a prévia do JOIN
+-- MAGIC
+-- MAGIC **Resultado esperado:** `gold.sismo_clima_horario` com 24 linhas por sismo da silver (linhas = sismos × 24), sem par `evento_id` + `hora_utc` repetido. Tabela recriada inteira.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Fixar fuso UTC
 SET TIME ZONE 'UTC';  -- datas e horas desta sessão passam a ser calculadas e exibidas em UTC
 SELECT current_timezone() AS fuso;  -- confirma o fuso da sessão (esperado: UTC)
@@ -22,7 +37,7 @@ LIMIT 5;  -- só as 5 primeiras linhas
 -- COMMAND ----------
 
 -- DBTITLE 1,Conferir o JOIN (sem multiplicar linhas)
--- Compara o resultado do JOIN com o que se espera: 224 sismos x 24 horas = 5376
+-- Compara o resultado do JOIN com o que se espera: sismos da silver x 24 horas
 SELECT
   (SELECT count(*)  -- JOIN interno: só linhas que existem nos dois lados
      FROM ft03_sismos_clima.silver.sismos AS s
@@ -31,7 +46,7 @@ SELECT
      FROM ft03_sismos_clima.silver.sismos AS s
      LEFT JOIN ft03_sismos_clima.silver.clima_horario AS c ON c.evento_id = s.evento_id) AS linhas_left,
   (SELECT count(*) FROM ft03_sismos_clima.silver.clima_horario) AS linhas_clima,  -- tamanho da tabela de clima
-  (SELECT count(*) * 24 FROM ft03_sismos_clima.silver.sismos) AS esperado  -- 224 sismos x 24 horas
+  (SELECT count(*) * 24 FROM ft03_sismos_clima.silver.sismos) AS esperado  -- sismos da silver x 24 horas
 
 -- COMMAND ----------
 
@@ -87,10 +102,10 @@ FROM horas;
 
 -- DBTITLE 1,Conferir gold.sismo_clima_horario
 SELECT
-  count(*) AS linhas,  -- esperado 5376
-  count(DISTINCT evento_id) AS sismos,  -- esperado 224
-  count(DISTINCT evento_id, hora_utc) AS pares_unicos,  -- esperado 5376 (nenhum par repetido)
-  count_if(periodo = 'hora do sismo') AS horas_do_sismo,  -- esperado 224 (uma por sismo)
+  count(*) AS linhas,  -- esperado: sismos x 24
+  count(DISTINCT evento_id) AS sismos,  -- esperado: igual a silver.sismos
+  count(DISTINCT evento_id, hora_utc) AS pares_unicos,  -- esperado: igual a linhas (nenhum par repetido)
+  count_if(periodo = 'hora do sismo') AS horas_do_sismo,  -- esperado: igual a sismos (uma por sismo)
   count_if(horas_desde_sismo IS NULL) AS sem_horas_desde,  -- esperado 0
   min(horas_desde_sismo) AS horas_desde_min,  -- esperado entre -23 e 0
   max(horas_desde_sismo) AS horas_desde_max,  -- esperado entre 0 e 23

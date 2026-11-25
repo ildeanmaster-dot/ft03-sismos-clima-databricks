@@ -3,6 +3,23 @@
 # [tool.databricks.environment]
 # environment_version = "6"
 # ///
+# DBTITLE 1,Resumo do arquivo
+# MAGIC %md
+# MAGIC # 01_extracao_bronze
+# MAGIC **O que faz:** extrai os dados das duas APIs e grava o JSON bruto no volume `bronze.raw`. É a primeira tarefa (`extracao`) do job. O notebook é fino: a lógica está em `src/sismos_clima` (config, http_client, extract).
+# MAGIC
+# MAGIC **O que contém:**
+# MAGIC - leitura dos parâmetros do job (`data_inicio`, `data_fim`, `magnitude_minima`, `catalogo`)
+# MAGIC - chamada de `extrair`, que consulta a USGS (count e eventos) e, para cada sismo, o Open-Meteo do dia UTC no epicentro
+# MAGIC - limpeza dos .json antigos de `raw` depois que a USGS responde, para a execução não herdar arquivos de outro período
+# MAGIC - conferência dos arquivos gravados
+# MAGIC
+# MAGIC **Resultado esperado:** no volume `/Volumes/<catalogo>/bronze/raw/`: `usgs/eventos_<inicio>_<fim>.json` (1 arquivo), `open_meteo/<evento_id>.json` (1 por sismo) e `extracao_relatorio.json` com `completo` verdadeiro.
+# MAGIC
+# MAGIC Atenção: a célula de extração chama as APIs e apaga os arquivos antigos de `raw`; rode-a só pelo job.
+
+# COMMAND ----------
+
 # DBTITLE 1,Preparar import dos módulos
 import os  # consulta a pasta atual do notebook
 import sys  # controla onde o Python procura pacotes

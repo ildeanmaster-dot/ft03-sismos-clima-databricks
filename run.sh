@@ -4,6 +4,9 @@
 # Uso: bash run.sh                          (perfil ft03, corpo jobs/run_padrao.json)
 #      PERFIL=outro bash run.sh             (outro perfil da CLI)
 #      bash run.sh jobs/outro_corpo.json    (outro corpo do run-now, por exemplo com job_parameters)
+# O que contém: leitura do perfil e do corpo, disparo do job com `databricks jobs run-now` e conferência do result_state.
+# Resultado esperado: o JSON da execução com result_state SUCCESS (7 tarefas) e código de saída 0;
+#   sem SUCCESS, a mensagem "O job não terminou em SUCCESS." e código de saída 1.
 set -euo pipefail  # para no primeiro erro, em variável não definida e em falha dentro de pipe
 
 PERFIL="${PERFIL:-ft03}"  # perfil da CLI; a variável de ambiente PERFIL troca o padrão

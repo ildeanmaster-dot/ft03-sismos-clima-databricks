@@ -36,8 +36,8 @@
 # MAGIC ## 1 · Escopo
 # MAGIC - Pergunta: clima horário no epicentro, no dia UTC de cada sismo de magnitude 5 ou mais.
 # MAGIC - Fontes: USGS Earthquake Catalog (sismologia) e Open-Meteo Historical (meteorologia).
-# MAGIC - Período padrão: 01 a 31/10/2026. Valores esperados nessa janela: 224 sismos, 5.376 linhas na gold (224 x 24).
-# MAGIC - Execução: Databricks Free Edition, serverless, job de 7 tarefas.
+# MAGIC - Período padrão: 01 a 31/10/2026. Valores esperados: 1 linha de `silver.sismos` por sismo da USGS e 24 linhas de gold por sismo (linhas = sismos x 24). Em 24/11/2026 foram 224 sismos e 5.376 linhas; em 25/11/2026, 225 e 5.400 (OB-53).
+# MAGIC - Execução: Databricks, compute serverless, job de 7 tarefas.
 
 # COMMAND ----------
 
@@ -107,7 +107,7 @@
 # MAGIC - Open-Meteo: `LATERAL VIEW posexplode(hourly.time)` cria uma linha por hora e a posição lê as outras listas com `try_element_at`.
 # MAGIC - Transformações na silver: T1 tipos e datas, T2 nulos (linha sem chave, instante, magnitude ou coordenada é rejeitada; clima nulo continua nulo), T3 deduplicação (versão mais recente).
 # MAGIC
-# MAGIC Esperado: 1 linha na bronze com 224 sismos na lista e 224 linhas na silver; as listas do sismo `us6000tyny` na bronze aparecem como linhas na silver, com os mesmos valores.
+# MAGIC Esperado: 1 linha na bronze com a lista de todos os sismos do período e uma linha na silver por sismo da lista; as listas do sismo `us6000tyny` na bronze aparecem como linhas na silver, com os mesmos valores.
 
 # COMMAND ----------
 

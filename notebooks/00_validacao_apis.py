@@ -1,4 +1,21 @@
 # Databricks notebook source
+# DBTITLE 1,Resumo do arquivo
+# MAGIC %md
+# MAGIC # 00_validacao_apis
+# MAGIC **O que faz:** valida as duas APIs antes de construir o pipeline: faz chamadas reais e mostra o que cada uma devolve.
+# MAGIC
+# MAGIC **O que contém:**
+# MAGIC - célula 1: `count` da USGS (quantos sismos M5+ no período, sem baixar os eventos)
+# MAGIC - célula 2: consulta de 3 sismos da USGS, com id, magnitude, instante e coordenadas
+# MAGIC - célula 3: clima horário do Open-Meteo no epicentro de um sismo
+# MAGIC - célula 4: clima dos 3 sismos, para provar que o cruzamento por evento é possível
+# MAGIC
+# MAGIC **Resultado esperado:** HTTP 200 nas quatro células; a contagem da USGS para 01 a 31/10/2026 (224 na validação de 23/11/2026) e 24 horas de clima por sismo, sem nulos.
+# MAGIC
+# MAGIC Notebook de validação inicial (etapa 0). Não grava nada e não faz parte do job.
+
+# COMMAND ----------
+
 # DBTITLE 1,1 - Contar sismos (USGS count)
 import requests  # biblioteca HTTP do Python: é ela que faz a chamada GET para a API
 

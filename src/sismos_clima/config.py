@@ -1,5 +1,9 @@
 """Parâmetros do pipeline lidos de variáveis de ambiente.
 
+O que faz: monta a `Configuracao` (período, magnitude mínima, catálogo) e valida o período.
+O que contém: a dataclass `Configuracao` (imutável) e `carregar_configuracao`.
+Resultado esperado: uma `Configuracao` válida; `data_fim` anterior a `data_inicio` levanta `ValueError`, e a extração nem começa.
+
 Os nomes e os valores padrão seguem o arquivo .env.example da raiz do repositório.
 Nenhum segredo fica no código: a chave do Open-Meteo, quando existir, vem do ambiente.
 """

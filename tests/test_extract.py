@@ -1,4 +1,8 @@
-"""Testes das funções puras de extração."""
+"""Testes das funções puras de extração.
+
+O que faz: confere filtros, parâmetros, dia UTC, gravação e limpeza do `raw` com dados pequenos.
+Resultado esperado: 13 testes aprovados.
+"""
 import sys
 from datetime import date
 from pathlib import Path
